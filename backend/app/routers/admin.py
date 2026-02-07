@@ -6,9 +6,20 @@ from app.schemas.user import (
     AdminCreateInstructor,
     AdminCreateCourse,
     AdminAssignInstructor,
-    InstructorProfile,
 )
-from app.schemas.course import CourseResponse
+from app.services.auth_service import (
+    create_instructor,
+    get_all_students,
+    get_all_instructors,
+    remove_student,
+)
+from app.services.course_service import (
+    create_course,
+    delete_course,
+    assign_instructor,
+)
+from app.services.enroll_service import enroll_student, drop_student
+from app.schemas.enrollment import EnrollmentCreate
 
 router = APIRouter()
 
@@ -16,14 +27,13 @@ router = APIRouter()
 # ==================== INSTRUCTOR MANAGEMENT ====================
 
 @router.post("/instructors", status_code=201)
-async def create_instructor(
+async def admin_create_instructor(
     data: AdminCreateInstructor,
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
     """Admin creates a new instructor (User + Instructor record)."""
-    # TODO: service logic will be added later
-    pass
+    return create_instructor(db, data)
 
 
 @router.get("/instructors")
@@ -32,32 +42,38 @@ async def list_instructors(
     current_user: dict = Depends(require_admin),
 ):
     """Admin lists all instructors."""
-    # TODO: service logic will be added later
-    pass
+    return get_all_instructors(db)
 
 
 # ==================== COURSE MANAGEMENT ====================
 
 @router.post("/courses", status_code=201)
-async def create_course(
+async def admin_create_course(
     data: AdminCreateCourse,
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
     """Admin creates a new course."""
-    # TODO: service logic will be added later
-    pass
+    from app.schemas.course import CourseCreate
+    course_create = CourseCreate(
+        course_name=data.course_name,
+        duration=data.duration,
+        program_type=data.program_type,
+        instructor_id=data.instructor_id,
+        university_id=data.university_id,
+    )
+    return create_course(db, course_create)
 
 
 @router.delete("/courses/{course_id}")
-async def delete_course(
+async def admin_delete_course(
     course_id: int,
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
     """Admin deletes a course."""
-    # TODO: service logic will be added later
-    pass
+    delete_course(db, course_id)
+    return {"message": f"Course {course_id} deleted successfully"}
 
 
 @router.put("/courses/assign-instructor")
@@ -67,8 +83,7 @@ async def assign_instructor_to_course(
     current_user: dict = Depends(require_admin),
 ):
     """Admin assigns an instructor to a course."""
-    # TODO: service logic will be added later
-    pass
+    return assign_instructor(db, data.course_id, data.instructor_id)
 
 
 # ==================== STUDENT MANAGEMENT ====================
@@ -79,22 +94,21 @@ async def list_students(
     current_user: dict = Depends(require_admin),
 ):
     """Admin lists all students."""
-    # TODO: service logic will be added later
-    pass
+    return get_all_students(db)
 
 
 @router.delete("/students/{student_id}")
-async def remove_student(
+async def admin_remove_student(
     student_id: int,
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
     """Admin removes a student."""
-    # TODO: service logic will be added later
-    pass
+    remove_student(db, student_id)
+    return {"message": f"Student {student_id} removed successfully"}
 
 
-@router.post("/students/{student_id}/enroll/{course_id}")
+@router.post("/students/{student_id}/enroll/{course_id}", status_code=201)
 async def admin_enroll_student(
     student_id: int,
     course_id: int,
@@ -102,8 +116,8 @@ async def admin_enroll_student(
     current_user: dict = Depends(require_admin),
 ):
     """Admin enrolls a student in a course."""
-    # TODO: service logic will be added later
-    pass
+    enrollment_data = EnrollmentCreate(student_id=student_id, course_id=course_id)
+    return enroll_student(db, enrollment_data)
 
 
 @router.delete("/students/{student_id}/drop/{course_id}")
@@ -114,5 +128,5 @@ async def admin_drop_student(
     current_user: dict = Depends(require_admin),
 ):
     """Admin drops a student from a course."""
-    # TODO: service logic will be added later
-    pass
+    drop_student(db, student_id, course_id)
+    return {"message": f"Student {student_id} dropped from course {course_id}"}

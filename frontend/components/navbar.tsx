@@ -1,6 +1,7 @@
 "use client"
 
 import { QuintetLogo } from "@/components/quintet-logo"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Navbar() {
   return (
@@ -23,12 +24,15 @@ export function Navbar() {
             About
           </a>
         </div>
-        <a
-          href="#roles"
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90"
-        >
-          Get Started
-        </a>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <a
+            href="#roles"
+            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90"
+          >
+            Get Started
+          </a>
+        </div>
       </nav>
     </header>
   )

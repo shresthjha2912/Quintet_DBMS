@@ -1,6 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
 
 
 class EnrollmentCreate(BaseModel):
@@ -9,11 +7,20 @@ class EnrollmentCreate(BaseModel):
 
 
 class EnrollmentResponse(BaseModel):
-    id: int
     student_id: int
     course_id: int
-    status: str
-    enrolled_at: Optional[datetime] = None
+    evaluation_score: float
+
+    class Config:
+        from_attributes = True
+
+
+class EnrollmentWithDetails(BaseModel):
+    """Enrollment with course name for student profile view"""
+    student_id: int
+    course_id: int
+    course_name: str
+    evaluation_score: float
 
     class Config:
         from_attributes = True

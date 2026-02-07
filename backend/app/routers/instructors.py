@@ -1,18 +1,27 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.core.security import get_current_user
+from app.core.security import require_instructor
+from app.schemas.user import InstructorProfile
 
 router = APIRouter()
 
 
-@router.get("/")
-async def get_instructors(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    # TODO: Implement get all instructors
-    return {"message": "List of instructors"}
+@router.get("/profile", response_model=InstructorProfile)
+async def get_my_profile(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_instructor),
+):
+    """Instructor views their own profile (name, expertise, assigned courses)."""
+    # TODO: service logic will be added later
+    pass
 
 
-@router.get("/{instructor_id}")
-async def get_instructor(instructor_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    # TODO: Implement get instructor by ID
-    return {"message": f"Instructor {instructor_id}"}
+@router.get("/my-courses")
+async def my_courses(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_instructor),
+):
+    """Instructor views courses assigned to them."""
+    # TODO: service logic will be added later
+    pass

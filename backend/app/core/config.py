@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     # CORS
     ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
 
+    # Predefined Admin Credentials
+    ADMIN_EMAIL: str = "admin@quintet.com"
+    ADMIN_PASSWORD: str = "admin123"
+
     class Config:
         env_file = ".env"
         extra = "allow"

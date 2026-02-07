@@ -1,2 +1,1 @@
-# Qunitet_
-# first comment.
+# Quintet_DBMS

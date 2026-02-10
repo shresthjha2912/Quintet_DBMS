@@ -10,7 +10,7 @@ class Course(Base):
     course_name = Column(String, nullable=False)
     duration = Column(String, nullable=False)
     program_type = Column(String, nullable=False)
-    instructor_id = Column(Integer, ForeignKey("instructors.instructor_id"), nullable=False)
+    instructor_id = Column(Integer, ForeignKey("instructors.instructor_id"), nullable=True)
     university_id = Column(Integer, ForeignKey("universities.university_id"), nullable=False)
 
     instructor = relationship("Instructor", back_populates="courses")

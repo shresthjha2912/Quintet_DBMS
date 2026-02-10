@@ -108,3 +108,35 @@ def assign_instructor(db: Session, course_id: int, instructor_id: int) -> Course
     db.commit()
     db.refresh(course)
     return course
+
+
+def get_course_detail(db: Session, course_id: int) -> dict:
+    """Get detailed course info with instructor name, university name, and enrolled students."""
+    course = db.query(Course).filter(Course.course_id == course_id).first()
+    if not course:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found")
+
+    from app.models.enrollment import Enrollment
+    enrollments = (
+        db.query(Enrollment).filter(Enrollment.course_id == course_id).all()
+    )
+
+    return {
+        "course_id": course.course_id,
+        "course_name": course.course_name,
+        "duration": course.duration,
+        "program_type": course.program_type,
+        "instructor_id": course.instructor_id,
+        "instructor_name": course.instructor.name if course.instructor else "Unassigned",
+        "instructor_email": course.instructor.user.email_id if course.instructor and course.instructor.user else None,
+        "university_id": course.university_id,
+        "university_name": course.university.name if course.university else "Unknown",
+        "enrolled_students": [
+            {
+                "student_id": e.student_id,
+                "student_email": e.student.user.email_id if e.student and e.student.user else None,
+                "evaluation_score": e.evaluation_score,
+            }
+            for e in enrollments
+        ],
+    }

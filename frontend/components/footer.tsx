@@ -10,13 +10,14 @@ export function Footer() {
             <span className="font-display text-lg font-bold text-foreground">Quintet</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-            <span>Database Management Systems Project</span>
+            <span>Academic Learning Platform (Demonstration)</span>
             <span className="hidden h-4 w-px bg-border md:block" aria-hidden="true" />
-            <span>Academic Year 2025{"-"}2026</span>
+            <span>Academic Year 2025-2026</span>
           </div>
         </div>
         <div className="mt-8 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-          Built with Next.js & Tailwind CSS {"·"} A University DBMS Project
+          Built with Next.js & Tailwind CSS {"·"} A University learning platform demo
+          <div className="mt-2">Made by Sayon Sujit Mondal, Shresth Jha, Asmit Pandey, Harshvardhan Repaswal, Jay Jani</div>
         </div>
       </div>
     </footer>

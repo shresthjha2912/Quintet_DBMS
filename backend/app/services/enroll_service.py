@@ -103,6 +103,27 @@ def get_enrollments_by_course(db: Session, course_id: int) -> list[dict]:
             "student_id": e.student_id,
             "course_id": e.course_id,
             "evaluation_score": e.evaluation_score,
+            "student_name": e.student.user.email_id if e.student and e.student.user else None,
+            "student_email": e.student.user.email_id if e.student and e.student.user else None,
         }
         for e in enrollments
     ]
+
+
+def grade_student(db: Session, course_id: int, student_id: int, score: float) -> dict:
+    """Instructor assigns/updates evaluation score for a student's enrollment."""
+    enrollment = (
+        db.query(Enrollment)
+        .filter(Enrollment.course_id == course_id, Enrollment.student_id == student_id)
+        .first()
+    )
+    if not enrollment:
+        raise HTTPException(status_code=404, detail="Enrollment not found")
+    enrollment.evaluation_score = score
+    db.commit()
+    db.refresh(enrollment)
+    return {
+        "student_id": enrollment.student_id,
+        "course_id": enrollment.course_id,
+        "evaluation_score": enrollment.evaluation_score,
+    }

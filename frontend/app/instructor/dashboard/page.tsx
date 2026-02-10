@@ -99,7 +99,9 @@ export default function InstructorDashboard() {
                 {courses.map((course) => (
                   <Card key={course.course_id}>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-base">{course.course_name}</CardTitle>
+                      <CardTitle className="text-base">
+                        <a href={`/courses/${course.course_id}`} className="hover:underline">{course.course_name}</a>
+                      </CardTitle>
                       <CardDescription>Course #{course.course_id}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">

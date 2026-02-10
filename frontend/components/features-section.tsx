@@ -12,17 +12,6 @@ const features = [
     ),
   },
   {
-    title: "Database Management",
-    description: "Full CRUD operations on relational database models with ER diagram-based schema design.",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6" aria-hidden="true">
-        <ellipse cx="12" cy="5" rx="9" ry="3" />
-        <path d="M3 5V19A9 3 0 0 0 21 19V5" />
-        <path d="M3 12A9 3 0 0 0 21 12" />
-      </svg>
-    ),
-  },
-  {
     title: "Analytics Dashboard",
     description: "Real-time insights and visualizations for enrollment trends, course performance, and more.",
     icon: (
@@ -57,7 +46,7 @@ export function FeaturesSection() {
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
           {features.map((feature) => (
             <div
               key={feature.title}

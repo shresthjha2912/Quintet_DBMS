@@ -54,19 +54,18 @@ export function HeroSection() {
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
           <span className="h-2 w-2 rounded-full bg-accent" />
           <span className="text-xs font-semibold tracking-wide text-primary">
-            DBMS Academic Project
+            Academic Learning Platform
           </span>
         </div>
 
         <h1 className="mb-6 text-balance font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
-          Quintet{" "}
-          <span className="text-primary">{"–"}</span>{" "}
-          A Unified Learning & Database Management Platform
+          Quintet — A Unified Learning Platform
         </h1>
 
         <p className="mx-auto mb-10 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
-          A comprehensive DBMS-based learning system that empowers students, instructors,
-          administrators, and analysts through a single, unified platform. Select your role below to get started.
+          Quintet is a lightweight learning platform for students and instructors. It demonstrates course
+          workflows, enrollments, and analytics for educational purposes.
+          Select your role below to get started.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">

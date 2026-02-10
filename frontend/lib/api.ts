@@ -117,6 +117,12 @@ export function enrollInCourse(student_id: number, course_id: number) {
   });
 }
 
+export function unenrollFromCourse(course_id: number) {
+  return apiFetch(`/api/students/unenroll/${course_id}`, {
+    method: "DELETE",
+  });
+}
+
 export function getMyEnrolledCourses() {
   return apiFetch<
     {
@@ -149,6 +155,22 @@ export function getInstructorCourses() {
       university_id: number;
     }[]
   >("/api/instructors/my-courses");
+}
+
+export function getCourseStudents(course_id: number) {
+  return apiFetch<
+    {
+      student_id: number;
+      course_id: number;
+      evaluation_score: number;
+      student_name?: string | null;
+      student_email?: string | null;
+    }[]
+  >(`/api/instructors/courses/${course_id}/students`);
+}
+
+export function gradeStudent(course_id: number, student_id: number, score: number) {
+  return apiFetch(`/api/instructors/courses/${course_id}/grade?student_id=${student_id}&score=${score}`, { method: "POST" });
 }
 
 // ─── Analyst endpoints ─────────────────────────────────
@@ -193,6 +215,7 @@ export function adminGetStudents() {
     {
       student_id: number;
       user_id: number;
+      email_id: string;
       age: number;
       skill_level: string;
       category: string;
@@ -222,6 +245,62 @@ export function adminDeleteCourse(course_id: number) {
   return apiFetch(`/api/admin/courses/${course_id}`, { method: "DELETE" });
 }
 
+export function adminDeleteInstructor(instructor_id: number) {
+  return apiFetch(`/api/admin/instructors/${instructor_id}`, { method: "DELETE" });
+}
+
+export function adminGetInstructorDetail(instructor_id: number) {
+  return apiFetch<{
+    instructor_id: number;
+    user_id: number;
+    email_id: string;
+    name: string;
+    expertise: string;
+    courses: {
+      course_id: number;
+      course_name: string;
+      duration: string;
+      program_type: string;
+    }[];
+  }>(`/api/admin/instructors/${instructor_id}`);
+}
+
+export function adminGetStudentDetail(student_id: number) {
+  return apiFetch<{
+    student_id: number;
+    user_id: number;
+    email_id: string;
+    age: number;
+    skill_level: string;
+    category: string;
+    country: string;
+    enrollments: {
+      course_id: number;
+      course_name: string | null;
+      evaluation_score: number;
+    }[];
+  }>(`/api/admin/students/${student_id}`);
+}
+
+export function adminGetCourseDetail(course_id: number) {
+  return apiFetch<{
+    course_id: number;
+    course_name: string;
+    duration: string;
+    program_type: string;
+    instructor_id: number | null;
+    instructor_name: string;
+    instructor_email: string | null;
+    university_id: number;
+    university_name: string;
+    enrolled_students: {
+      student_id: number;
+      student_email: string | null;
+      evaluation_score: number;
+    }[];
+  }>(`/api/admin/courses/${course_id}`);
+}
+
 // ─── Public courses ────────────────────────────────────
 export function getPublicCourses() {
   return apiFetch<
@@ -234,4 +313,51 @@ export function getPublicCourses() {
       university_id: number;
     }[]
   >("/api/courses");
+}
+
+// ─── Course content ────────────────────────────────────
+export function getCourseContent(course_id: number) {
+  return apiFetch<
+    {
+      content_id: number;
+      course_id: number;
+      type: string;
+      content_url: string;
+    }[]
+  >(`/api/content/${course_id}`);
+}
+
+// ─── Course textbooks ──────────────────────────────────
+export function getCourseTextbooks(course_id: number) {
+  return apiFetch<
+    {
+      textbook_id: number;
+      title: string;
+      author: string;
+      link: string | null;
+    }[]
+  >(`/api/courses/${course_id}/textbooks`);
+}
+
+// ─── Instructor: add content ───────────────────────────
+export function addCourseContent(
+  course_id: number,
+  type: string,
+  content_url: string,
+) {
+  return apiFetch<{
+    content_id: number;
+    course_id: number;
+    type: string;
+    content_url: string;
+  }>(`/api/instructors/courses/${course_id}/content`, {
+    method: "POST",
+    body: JSON.stringify({ type, content_url }),
+  });
+}
+
+export function deleteCourseContent(course_id: number, content_id: number) {
+  return apiFetch(`/api/instructors/courses/${course_id}/content/${content_id}`, {
+    method: "DELETE",
+  });
 }

@@ -10,6 +10,7 @@ const roles = [
     color: "bg-primary",
     lightBg: "bg-primary/10",
     textColor: "text-primary",
+    buttonText: "text-primary-foreground",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8" aria-hidden="true">
         <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
@@ -24,6 +25,7 @@ const roles = [
     color: "bg-accent",
     lightBg: "bg-accent/10",
     textColor: "text-accent",
+    buttonText: "text-primary-foreground",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8" aria-hidden="true">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -37,9 +39,10 @@ const roles = [
     title: "Admin",
     description: "Manage users, configure system settings, oversee departments, and maintain the platform.",
     href: "/admin/login",
-    color: "bg-foreground",
+    color: "bg-foreground dark:bg-slate-200",
     lightBg: "bg-foreground/10",
     textColor: "text-foreground",
+    buttonText: "text-background dark:text-slate-900",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8" aria-hidden="true">
         <circle cx="12" cy="12" r="3" />
@@ -54,6 +57,7 @@ const roles = [
     color: "bg-chart-2",
     lightBg: "bg-accent/10",
     textColor: "text-accent",
+    buttonText: "text-primary-foreground",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8" aria-hidden="true">
         <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
@@ -92,7 +96,7 @@ export function RoleCards() {
               <p className="mb-6 flex-1 text-sm leading-relaxed text-muted-foreground">
                 {role.description}
               </p>
-              <div className={`mx-auto inline-flex items-center gap-2 rounded-lg ${role.color} px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all group-hover:gap-3`}>
+              <div className={`mx-auto inline-flex items-center gap-2 rounded-lg ${role.color} px-6 py-2.5 text-sm font-semibold ${role.buttonText} transition-all group-hover:gap-3`}>
                 Sign In
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true">
                   <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638l-3.96-3.96a.75.75 0 111.06-1.06l5.25 5.25a.75.75 0 010 1.06l-5.25 5.25a.75.75 0 11-1.06-1.06l3.96-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />

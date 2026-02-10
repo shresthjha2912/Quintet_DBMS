@@ -151,14 +151,14 @@ try:
 
     # ── 7. Textbooks ─────────────────────────────────────────────
     textbooks_data = [
-        {"title": "Pattern Recognition and Machine Learning", "author": "Christopher Bishop"},
-        {"title": "Deep Learning",                            "author": "Ian Goodfellow"},
-        {"title": "Effective Java",                           "author": "Joshua Bloch"},
-        {"title": "Operating System Concepts",                "author": "Abraham Silberschatz"},
-        {"title": "Computer Vision: Algorithms and Applications", "author": "Richard Szeliski"},
-        {"title": "Clean Code",                               "author": "Robert C. Martin"},
-        {"title": "Introduction to Algorithms (CLRS)",        "author": "Cormen, Leiserson, Rivest, Stein"},
-        {"title": "HTML and CSS: Design and Build Websites",  "author": "Jon Duckett"},
+        {"title": "Pattern Recognition and Machine Learning", "author": "Christopher Bishop", "link": "https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf"},
+        {"title": "Deep Learning",                            "author": "Ian Goodfellow", "link": "https://www.deeplearningbook.org/"},
+        {"title": "Effective Java",                           "author": "Joshua Bloch", "link": "https://www.oreilly.com/library/view/effective-java/9780134686097/"},
+        {"title": "Operating System Concepts",                "author": "Abraham Silberschatz", "link": "https://www.os-book.com/OS10/"},
+        {"title": "Computer Vision: Algorithms and Applications", "author": "Richard Szeliski", "link": "https://szeliski.org/Book/"},
+        {"title": "Clean Code",                               "author": "Robert C. Martin", "link": "https://www.oreilly.com/library/view/clean-code-a/9780136083238/"},
+        {"title": "Introduction to Algorithms (CLRS)",        "author": "Cormen, Leiserson, Rivest, Stein", "link": "https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"},
+        {"title": "HTML and CSS: Design and Build Websites",  "author": "Jon Duckett", "link": "https://www.htmlandcssbook.com/"},
     ]
 
     for tb in textbooks_data:
@@ -217,21 +217,46 @@ try:
     db.flush()
     print(f"✅ Created {len(textbooks_used_data)} textbook-course links")
 
-    # ── 10. Contents ─────────────────────────────────────────────
+    # ── 10. Contents (real working links) ────────────────────────
     contents_data = [
-        {"course_id": courses[0].course_id, "type": "video",   "content_url": "https://example.com/ml/lecture1.mp4"},
-        {"course_id": courses[0].course_id, "type": "pdf",     "content_url": "https://example.com/ml/notes.pdf"},
-        {"course_id": courses[1].course_id, "type": "video",   "content_url": "https://example.com/dl/lecture1.mp4"},
-        {"course_id": courses[1].course_id, "type": "quiz",    "content_url": "https://example.com/dl/quiz1.html"},
-        {"course_id": courses[2].course_id, "type": "video",   "content_url": "https://example.com/java/lecture1.mp4"},
-        {"course_id": courses[3].course_id, "type": "pdf",     "content_url": "https://example.com/se/handbook.pdf"},
-        {"course_id": courses[4].course_id, "type": "video",   "content_url": "https://example.com/linux/lecture1.mp4"},
-        {"course_id": courses[5].course_id, "type": "pdf",     "content_url": "https://example.com/os/slides.pdf"},
-        {"course_id": courses[6].course_id, "type": "video",   "content_url": "https://example.com/cv/lecture1.mp4"},
-        {"course_id": courses[7].course_id, "type": "quiz",    "content_url": "https://example.com/ai/quiz1.html"},
-        {"course_id": courses[8].course_id, "type": "video",   "content_url": "https://example.com/webdev/lecture1.mp4"},
-        {"course_id": courses[8].course_id, "type": "pdf",     "content_url": "https://example.com/webdev/cheatsheet.pdf"},
-        {"course_id": courses[9].course_id, "type": "video",   "content_url": "https://example.com/fullstack/lecture1.mp4"},
+        # Machine Learning
+        {"course_id": courses[0].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=jGwO_UgTS7I"},
+        {"course_id": courses[0].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Machine_learning"},
+        {"course_id": courses[0].course_id, "type": "pdf",     "content_url": "https://arxiv.org/pdf/2303.18223"},
+        # Deep Learning Specialization
+        {"course_id": courses[1].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=CS4cs9xVecg"},
+        {"course_id": courses[1].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Deep_learning"},
+        {"course_id": courses[1].course_id, "type": "pdf",     "content_url": "https://arxiv.org/pdf/1706.03762"},
+        # Java Programming
+        {"course_id": courses[2].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=eIrMbAQSU34"},
+        {"course_id": courses[2].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Java_(programming_language)"},
+        {"course_id": courses[2].course_id, "type": "link",    "content_url": "https://docs.oracle.com/javase/tutorial/"},
+        # Software Engineering Principles
+        {"course_id": courses[3].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=O753uuutqH8"},
+        {"course_id": courses[3].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Software_engineering"},
+        # Linux Kernel Development
+        {"course_id": courses[4].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=WnGG-MhY9Os"},
+        {"course_id": courses[4].course_id, "type": "link",    "content_url": "https://www.kernel.org/doc/html/latest/"},
+        {"course_id": courses[4].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Linux_kernel"},
+        # Operating Systems
+        {"course_id": courses[5].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=vBURTt97EkA"},
+        {"course_id": courses[5].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Operating_system"},
+        {"course_id": courses[5].course_id, "type": "pdf",     "content_url": "https://pages.cs.wisc.edu/~remzi/OSTEP/intro.pdf"},
+        # Computer Vision with Deep Learning
+        {"course_id": courses[6].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=dJYGatp4SvA"},
+        {"course_id": courses[6].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Computer_vision"},
+        # Introduction to AI
+        {"course_id": courses[7].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=JMUxmLyrhSk"},
+        {"course_id": courses[7].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Artificial_intelligence"},
+        {"course_id": courses[7].course_id, "type": "pdf",     "content_url": "https://arxiv.org/pdf/2108.07258"},
+        # Web Development Fundamentals
+        {"course_id": courses[8].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=UB1O30fR-EE"},
+        {"course_id": courses[8].course_id, "type": "link",    "content_url": "https://developer.mozilla.org/en-US/docs/Learn"},
+        {"course_id": courses[8].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Web_development"},
+        # Full-Stack Web Applications
+        {"course_id": courses[9].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=nu_pCVPKzTk"},
+        {"course_id": courses[9].course_id, "type": "link",    "content_url": "https://nextjs.org/docs"},
+        {"course_id": courses[9].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Solution_stack"},
     ]
 
     for c in contents_data:

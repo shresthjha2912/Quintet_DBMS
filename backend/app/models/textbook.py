@@ -9,5 +9,6 @@ class Textbook(Base):
     textbook_id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     author = Column(String, nullable=False)
+    link = Column(String, nullable=True)  # URL to textbook (e.g. Amazon, PDF)
 
     textbooks_used = relationship("TextbookUsed", back_populates="textbook")

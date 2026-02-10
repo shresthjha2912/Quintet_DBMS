@@ -5,6 +5,7 @@ import { DashboardShell } from "@/components/dashboard-shell"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   getStudentProfile,
   browseCourses,
@@ -45,6 +46,7 @@ export default function StudentDashboard() {
   const [enrolling, setEnrolling] = useState<number | null>(null)
   const [error, setError] = useState("")
   const [tab, setTab] = useState<"my-courses" | "browse">("my-courses")
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     load()
@@ -86,6 +88,19 @@ export default function StudentDashboard() {
   const enrolledCourseIds = new Set(enrollments.map((e) => e.course_id))
   const availableCourses = courses.filter((c) => !enrolledCourseIds.has(c.course_id))
   const enrolledCourses = courses.filter((c) => enrolledCourseIds.has(c.course_id))
+
+  // Filter courses by search query (prefix match — shows courses starting with typed text)
+  const filteredBrowse = searchQuery
+    ? availableCourses.filter((c) =>
+        c.course_name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      )
+    : availableCourses
+
+  const filteredEnrolled = searchQuery
+    ? enrolledCourses.filter((c) =>
+        c.course_name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      )
+    : enrolledCourses
 
   return (
     <DashboardShell role="student" title="Student Dashboard">
@@ -133,6 +148,24 @@ export default function StudentDashboard() {
             </Card>
           )}
 
+          {/* Search bar */}
+          <div className="relative">
+            <Input
+              placeholder="Search courses by name…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-md"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
           {/* Tabs */}
           <div className="flex gap-2">
             <Button
@@ -151,17 +184,21 @@ export default function StudentDashboard() {
 
           {tab === "my-courses" && (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {enrolledCourses.length === 0 ? (
+              {filteredEnrolled.length === 0 ? (
                 <p className="col-span-full text-muted-foreground">
-                  You haven&apos;t enrolled in any courses yet. Click &quot;Browse Courses&quot; to get started!
+                  {searchQuery
+                    ? `No enrolled courses starting with "${searchQuery}".`
+                    : "You haven\u0027t enrolled in any courses yet. Click \"Browse Courses\" to get started!"}
                 </p>
               ) : (
-                enrolledCourses.map((course) => {
+                filteredEnrolled.map((course) => {
                   const enrollment = enrollments.find((e) => e.course_id === course.course_id)
                   return (
                     <Card key={course.course_id}>
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-base">{course.course_name}</CardTitle>
+                        <CardTitle className="text-base">
+                          <a href={`/courses/${course.course_id}`} className="hover:underline">{course.course_name}</a>
+                        </CardTitle>
                         <CardDescription>{course.program_type}</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-2">
@@ -183,15 +220,19 @@ export default function StudentDashboard() {
 
           {tab === "browse" && (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {availableCourses.length === 0 ? (
+              {filteredBrowse.length === 0 ? (
                 <p className="col-span-full text-muted-foreground">
-                  You&apos;re enrolled in all available courses!
+                  {searchQuery
+                    ? `No available courses starting with "${searchQuery}".`
+                    : "You\u0027re enrolled in all available courses!"}
                 </p>
               ) : (
-                availableCourses.map((course) => (
+                filteredBrowse.map((course) => (
                   <Card key={course.course_id}>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-base">{course.course_name}</CardTitle>
+                      <CardTitle className="text-base">
+                        <a href={`/courses/${course.course_id}`} className="hover:underline">{course.course_name}</a>
+                      </CardTitle>
                       <CardDescription>{course.program_type}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">

@@ -202,6 +202,58 @@ def get_all_instructors(db: Session) -> list[dict]:
     ]
 
 
+def get_student_by_id(db: Session, student_id: int) -> dict:
+    """Fetch a single student by student_id (admin use)."""
+    student = db.query(Student).filter(Student.student_id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+    # Also fetch their enrollments
+    from app.models.enrollment import Enrollment
+    enrollments = db.query(Enrollment).filter(Enrollment.student_id == student_id).all()
+    return {
+        "student_id": student.student_id,
+        "user_id": student.user_id,
+        "email_id": student.user.email_id,
+        "age": student.age,
+        "skill_level": student.skill_level,
+        "category": student.category,
+        "country": student.country,
+        "enrollments": [
+            {
+                "course_id": e.course_id,
+                "course_name": e.course.course_name if e.course else None,
+                "evaluation_score": e.evaluation_score,
+            }
+            for e in enrollments
+        ],
+    }
+
+
+def get_instructor_by_id(db: Session, instructor_id: int) -> dict:
+    """Fetch a single instructor by instructor_id (admin use)."""
+    instructor = db.query(Instructor).filter(Instructor.instructor_id == instructor_id).first()
+    if not instructor:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Instructor not found")
+    from app.models.course import Course
+    courses = db.query(Course).filter(Course.instructor_id == instructor_id).all()
+    return {
+        "instructor_id": instructor.instructor_id,
+        "user_id": instructor.user_id,
+        "email_id": instructor.user.email_id,
+        "name": instructor.name,
+        "expertise": instructor.expertise,
+        "courses": [
+            {
+                "course_id": c.course_id,
+                "course_name": c.course_name,
+                "duration": c.duration,
+                "program_type": c.program_type,
+            }
+            for c in courses
+        ],
+    }
+
+
 def remove_student(db: Session, student_id: int) -> None:
     """Admin removes a student and their associated user account."""
     student = db.query(Student).filter(Student.student_id == student_id).first()
@@ -217,6 +269,23 @@ def remove_student(db: Session, student_id: int) -> None:
     db.query(Enrollment).filter(Enrollment.student_id == student_id).delete()
 
     db.delete(student)
+    if user:
+        db.delete(user)
+    db.commit()
+
+
+def remove_instructor(db: Session, instructor_id: int) -> None:
+    """Admin removes an instructor and their associated user account."""
+    instructor = db.query(Instructor).filter(Instructor.instructor_id == instructor_id).first()
+    if not instructor:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Instructor not found")
+    user = db.query(User).filter(User.user_id == instructor.user_id).first()
+
+    # Delete courses assigned to instructor or unassign them (here we unassign)
+    from app.models.course import Course
+    db.query(Course).filter(Course.instructor_id == instructor_id).update({Course.instructor_id: None})
+
+    db.delete(instructor)
     if user:
         db.delete(user)
     db.commit()

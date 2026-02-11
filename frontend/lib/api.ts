@@ -26,13 +26,11 @@ export async function apiFetch<T = unknown>(
     throw new Error(body.detail || `API error ${res.status}`);
   }
 
-  // Handle 204 No Content
   if (res.status === 204) return {} as T;
 
   return res.json();
 }
 
-// ─── Auth ──────────────────────────────────────────────
 export interface TokenResponse {
   access_token: string;
   token_type: string;
@@ -84,7 +82,6 @@ export function loginAdmin(email_id: string, password: string) {
   });
 }
 
-// ─── Student endpoints ─────────────────────────────────
 export function getStudentProfile() {
   return apiFetch<{
     student_id: number;
@@ -133,7 +130,6 @@ export function getMyEnrolledCourses() {
   >("/api/students/my-courses");
 }
 
-// ─── Instructor endpoints ──────────────────────────────
 export function getInstructorProfile() {
   return apiFetch<{
     instructor_id: number;
@@ -173,7 +169,18 @@ export function gradeStudent(course_id: number, student_id: number, score: numbe
   return apiFetch(`/api/instructors/courses/${course_id}/grade?student_id=${student_id}&score=${score}`, { method: "POST" });
 }
 
-// ─── Analyst endpoints ─────────────────────────────────
+export function instructorGetStudentProfile(student_id: number) {
+  return apiFetch<{
+    student_id: number;
+    email_id: string | null;
+    age: number;
+    skill_level: string;
+    category: string;
+    country: string;
+    enrollments: { course_id: number; course_name: string | null; evaluation_score: number | null }[];
+  }>(`/api/instructors/students/${student_id}`);
+}
+
 export function getStatistics() {
   return apiFetch<Record<string, unknown>>("/api/analyst/statistics");
 }
@@ -194,7 +201,6 @@ export function getAnalystStudentDetail(student_id: number) {
   return apiFetch<Record<string, unknown>>(`/api/analyst/students/${student_id}`);
 }
 
-// ─── Admin endpoints ───────────────────────────────────
 export function adminGetInstructors() {
   return apiFetch<
     {
@@ -309,7 +315,6 @@ export function adminGetCourseDetail(course_id: number) {
   }>(`/api/admin/courses/${course_id}`);
 }
 
-// ─── Public courses ────────────────────────────────────
 export function getPublicCourses() {
   return apiFetch<
     {
@@ -323,7 +328,6 @@ export function getPublicCourses() {
   >("/api/courses");
 }
 
-// ─── Course content ────────────────────────────────────
 export function getCourseContent(course_id: number) {
   return apiFetch<
     {
@@ -335,7 +339,6 @@ export function getCourseContent(course_id: number) {
   >(`/api/content/${course_id}`);
 }
 
-// ─── Course textbooks ──────────────────────────────────
 export function getCourseTextbooks(course_id: number) {
   return apiFetch<
     {
@@ -347,7 +350,6 @@ export function getCourseTextbooks(course_id: number) {
   >(`/api/courses/${course_id}/textbooks`);
 }
 
-// ─── Instructor: add content ───────────────────────────
 export function addCourseContent(
   course_id: number,
   type: string,

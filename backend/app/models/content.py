@@ -8,7 +8,7 @@ class Content(Base):
 
     content_id = Column(Integer, primary_key=True, index=True)
     course_id = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
-    type = Column(String, nullable=False)  # "video", "pdf", "quiz", etc.
+    type = Column(String, nullable=False)
     content_url = Column(String, nullable=False)
 
     course = relationship("Course", back_populates="contents")

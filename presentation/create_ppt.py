@@ -1,7 +1,3 @@
-"""
-Quintet DBMS Project - Lab Presentation Generator
-Run: cd /home/shresth/Desktop/Qunitet_ && python presentation/create_ppt.py
-"""
 
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
@@ -9,7 +5,6 @@ from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 
-# ── Color Palette ──
 BG_DARK    = RGBColor(0x0F, 0x17, 0x2A)
 BG_CARD    = RGBColor(0x1E, 0x29, 0x3B)
 ACCENT     = RGBColor(0x38, 0xBD, 0xF8)
@@ -26,7 +21,6 @@ prs = Presentation()
 prs.slide_width  = Inches(13.333)
 prs.slide_height = Inches(7.5)
 
-# ── Helper Functions ──
 
 def set_slide_bg(slide, color):
     bg = slide.background
@@ -119,9 +113,6 @@ def add_numbered_card(slide, left, top, width, height, number, title, desc, acce
     return card
 
 
-# ================================================================
-# SLIDE 1: TITLE SLIDE
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -155,9 +146,6 @@ add_text_box(slide, Inches(3.2), Inches(6.3), Inches(7), Inches(0.4),
              "Harshvardhan Repaswal    |    Jay Jani", font_size=12, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
 
-# ================================================================
-# SLIDE 2: PROJECT OVERVIEW
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -199,9 +187,6 @@ for i, (num, label) in enumerate(stats):
                  label, font_size=13, color=MID_GRAY, alignment=PP_ALIGN.CENTER)
 
 
-# ================================================================
-# SLIDE 3: TECH STACK
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -253,9 +238,6 @@ for i, (section, color, items) in enumerate(tech):
                      desc, font_size=11, color=MID_GRAY)
 
 
-# ================================================================
-# SLIDE 4: DATABASE SCHEMA
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -297,9 +279,6 @@ add_text_box(slide, Inches(1), Inches(6.35), Inches(11.3), Inches(0.6),
              font_size=13, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
 
-# ================================================================
-# SLIDE 5: BACKEND ARCHITECTURE
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -336,12 +315,10 @@ code = '''# Router: receives HTTP request
 async def login(data: UserLogin, db = Depends(get_db)):
     return login_user(db, data.email_id, data.password, "student")
 
-# Schema: validates input
 class UserLogin(BaseModel):
     email_id: EmailStr
     password: str
 
-# Service: business logic
 def login_user(db, email, password, role):
     user = db.query(User).filter(
         User.email_id == email,
@@ -352,7 +329,6 @@ def login_user(db, email, password, role):
     token = create_access_token({"sub": user.email_id})
     return {"access_token": token, "role": role}
 
-# Model: database table
 class User(Base):
     __tablename__ = "users"
     user_id = Column(Integer, primary_key=True)
@@ -363,9 +339,6 @@ class User(Base):
 add_code_block(slide, Inches(6.2), Inches(1.8), Inches(6.5), Inches(5.4), code, font_size=10)
 
 
-# ================================================================
-# SLIDE 6: API ENDPOINTS
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -431,9 +404,6 @@ for i, (group, color, endpoints) in enumerate(endpoint_groups):
                      path, font_size=10, color=LIGHT_GRAY)
 
 
-# ================================================================
-# SLIDE 7: FRONTEND ARCHITECTURE
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -489,9 +459,6 @@ for i, (title, desc) in enumerate(features_list):
                  desc, font_size=10, color=MID_GRAY)
 
 
-# ================================================================
-# SLIDE 8: ROLE-BASED ACCESS CONTROL
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -554,9 +521,6 @@ for i, (role, color, perms) in enumerate(roles):
                      perm, font_size=12, color=LIGHT_GRAY)
 
 
-# ================================================================
-# SLIDE 9: SECURITY & AUTHENTICATION FLOW
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -598,9 +562,6 @@ for i, (title, desc) in enumerate(security_items):
                  desc, font_size=10, color=MID_GRAY)
 
 
-# ================================================================
-# SLIDE 10: SQL QUERIES & ORM
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -619,18 +580,15 @@ user = db.query(User).filter(
     User.user_id == student.user_id
 ).first()
 
-# AGGREGATE: General statistics
 total_students = db.query(func.count(Student.student_id)).scalar()
 avg_score = db.query(func.avg(Enrollment.evaluation_score)).scalar()
 
-# JOIN + GROUP BY: Courses per university
 courses_per_uni = db.query(
     University.name,
     func.count(Course.course_id)
 ).join(Course, Course.university_id == University.university_id
 ).group_by(University.name).all()
 
-# MULTI-TABLE JOIN: Course enrollments with student names
 enrollments = db.query(Enrollment, Student, User).join(
     Student, Enrollment.student_id == Student.student_id
 ).join(User, Student.user_id == User.user_id
@@ -666,9 +624,6 @@ WHERE e.course_id = :course_id;'''
 add_code_block(slide, Inches(7), Inches(1.9), Inches(5.8), Inches(5.0), sql_code, font_size=10)
 
 
-# ================================================================
-# SLIDE 11: ANALYTICS DASHBOARD
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -711,9 +666,6 @@ for i, (title, desc) in enumerate(analytics):
                  desc, font_size=11, color=MID_GRAY)
 
 
-# ================================================================
-# SLIDE 12: DEMO & HOW TO RUN
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -728,9 +680,6 @@ backend_cmd = '''cd backend
 source .venv/bin/activate
 uvicorn app.main:app --reload --port 8000
 
-# Swagger docs: http://127.0.0.1:8000/docs
-# Auto-creates 11 tables on startup
-# Seeds admin user (admin@quintet.com)'''
 
 add_code_block(slide, Inches(0.8), Inches(1.9), Inches(5.5), Inches(2.0), backend_cmd, font_size=12)
 
@@ -741,8 +690,6 @@ frontend_cmd = '''cd frontend
 pnpm install
 pnpm dev
 
-# Web UI: http://localhost:3000
-# All API calls proxied to :8000'''
 
 add_code_block(slide, Inches(0.8), Inches(4.7), Inches(5.5), Inches(1.6), frontend_cmd, font_size=12)
 
@@ -772,9 +719,6 @@ add_text_box(slide, Inches(7.2), Inches(6.45), Inches(5.1), Inches(0.6),
              font_size=12, color=MID_GRAY)
 
 
-# ================================================================
-# SLIDE 13: CHALLENGES & LEARNINGS
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -819,9 +763,6 @@ for i, (title, desc) in enumerate(learnings):
                  desc, font_size=11, color=MID_GRAY)
 
 
-# ================================================================
-# SLIDE 14: FUTURE SCOPE
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -855,9 +796,6 @@ for i, (title, desc, color) in enumerate(future_items):
                  desc, font_size=12, color=MID_GRAY)
 
 
-# ================================================================
-# SLIDE 15: THANK YOU
-# ================================================================
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, BG_DARK)
 
@@ -892,7 +830,6 @@ add_text_box(slide, Inches(2), Inches(6.9), Inches(9.3), Inches(0.3),
              font_size=12, color=MID_GRAY, alignment=PP_ALIGN.CENTER)
 
 
-# ── Save ──
 output_path = "/home/shresth/Desktop/Qunitet_/presentation/Quintet_DBMS_Presentation.pptx"
 prs.save(output_path)
 print(f"\n  Presentation saved to: {output_path}")

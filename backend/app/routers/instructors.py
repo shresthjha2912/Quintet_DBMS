@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 class AddContentRequest(BaseModel):
-    type: str       # "video", "pdf", "article", "link"
+    type: str
     content_url: str
 
 
@@ -21,7 +21,6 @@ async def get_my_profile(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_instructor),
 ):
-    """Instructor views their own profile (name, expertise)."""
     return get_instructor_profile(db, current_user["user_id"])
 
 
@@ -30,7 +29,6 @@ async def my_courses(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_instructor),
 ):
-    """Instructor views courses assigned to them."""
     from app.models.instructor import Instructor
     instructor = db.query(Instructor).filter(
         Instructor.user_id == current_user["user_id"]
@@ -46,7 +44,6 @@ async def course_students(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_instructor),
 ):
-    """Instructor views students enrolled in a course (with names/emails)."""
     return get_enrollments_by_course(db, course_id)
 
 
@@ -58,7 +55,6 @@ async def grade(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_instructor),
 ):
-    """Instructor grades a student for a given course."""
     return grade_student(db, course_id, student_id, score)
 
 
@@ -69,7 +65,6 @@ async def add_content(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_instructor),
 ):
-    """Instructor adds a content link (video, pdf, article, link) to a course."""
     from app.models.content import Content
     from app.models.course import Course
     from fastapi import HTTPException, status
@@ -101,7 +96,6 @@ async def delete_content(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_instructor),
 ):
-    """Instructor deletes a content link from a course."""
     from app.models.content import Content
     from fastapi import HTTPException, status
 
@@ -115,3 +109,45 @@ async def delete_content(
     db.delete(content)
     db.commit()
     return {"message": "Content deleted"}
+
+
+@router.get("/students/{student_id}")
+async def instructor_get_student_profile(
+    student_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_instructor),
+):
+    from app.models.student import Student
+    from app.models.user import User
+    from app.models.enrollment import Enrollment
+    from app.models.course import Course
+    from fastapi import HTTPException, status
+
+    student = db.query(Student).filter(Student.student_id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+
+    user = db.query(User).filter(User.user_id == student.user_id).first()
+
+    enrollments = (
+        db.query(Enrollment)
+        .filter(Enrollment.student_id == student_id)
+        .all()
+    )
+
+    return {
+        "student_id": student.student_id,
+        "email_id": user.email_id if user else None,
+        "age": student.age,
+        "skill_level": student.skill_level,
+        "category": student.category,
+        "country": student.country,
+        "enrollments": [
+            {
+                "course_id": e.course_id,
+                "course_name": e.course.course_name if e.course else None,
+                "evaluation_score": e.evaluation_score,
+            }
+            for e in enrollments
+        ],
+    }

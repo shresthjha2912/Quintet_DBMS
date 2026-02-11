@@ -2,13 +2,13 @@
 
 A modern, responsive learning management interface built with Next.js 14, Tailwind CSS, and Shadcn/UI.
 
-## 🌟 Key Features
+##  Key Features
 - **Role-Based Dashboards**: Customized experiences for Students, Instructors, Admins, and Analysts.
 - **Analytics Visualization**: Interactive charts for analysts using Recharts.
 - **Form Management**: Robust validation for student signup and administrative tasks.
 - **Authentication**: JWT-based session management with persistent React Context.
 
-## 🛠 Tech Stack
+##  Tech Stack
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
@@ -16,7 +16,7 @@ A modern, responsive learning management interface built with Next.js 14, Tailwi
 - **Charts**: Recharts
 - **Icons**: Lucide React
 
-## 🚀 Getting Started
+##  Getting Started
 
 1. **Install Dependencies**:
    ```bash
@@ -34,7 +34,7 @@ A modern, responsive learning management interface built with Next.js 14, Tailwi
    pnpm dev
    ```
 
-## 🏗 Directory Structure
+##  Directory Structure
 - `app/`: Routing and pages (organized by role)
 - `components/`: Reusable UI components and layout parts
 - `lib/api.ts`: API client functions for backend communication

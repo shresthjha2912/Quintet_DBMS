@@ -7,16 +7,7 @@ from app.schemas.user import StudentSignup, AdminCreateInstructor
 from app.core.security import hash_password, verify_password, create_access_token
 
 
-# ==================== STUDENT SIGNUP ====================
-
 def register_student(db: Session, data: StudentSignup) -> dict:
-    """
-    Student signup flow:
-    1. Check if email already exists
-    2. Create a User row (role=student)
-    3. Create a Student row linked to that User
-    4. Return a JWT token
-    """
     existing = db.query(User).filter(User.email_id == data.email_id).first()
     if existing:
         raise HTTPException(
@@ -24,16 +15,14 @@ def register_student(db: Session, data: StudentSignup) -> dict:
             detail="Email already registered",
         )
 
-    # 1. Create user
     new_user = User(
         email_id=data.email_id,
         password=hash_password(data.password),
         role="student",
     )
     db.add(new_user)
-    db.flush()  # flush to get user_id before creating student
+    db.flush()
 
-    # 2. Create student profile
     new_student = Student(
         user_id=new_user.user_id,
         age=data.age,
@@ -46,7 +35,6 @@ def register_student(db: Session, data: StudentSignup) -> dict:
     db.refresh(new_user)
     db.refresh(new_student)
 
-    # 3. Return JWT
     access_token = create_access_token(
         data={"sub": new_user.email_id, "role": new_user.role, "user_id": new_user.user_id}
     )
@@ -58,13 +46,7 @@ def register_student(db: Session, data: StudentSignup) -> dict:
     }
 
 
-# ==================== GENERIC LOGIN ====================
-
 def login_user(db: Session, email_id: str, password: str, expected_role: str) -> dict:
-    """
-    Generic login for all roles.
-    Verifies email + password + role match, then returns JWT.
-    """
     user = db.query(User).filter(User.email_id == email_id).first()
 
     if not user:
@@ -96,14 +78,7 @@ def login_user(db: Session, email_id: str, password: str, expected_role: str) ->
     }
 
 
-# ==================== ADMIN: CREATE INSTRUCTOR ====================
-
 def create_instructor(db: Session, data: AdminCreateInstructor) -> Instructor:
-    """
-    Admin creates an instructor:
-    1. Create a User row (role=instructor)
-    2. Create an Instructor row linked to that User
-    """
     existing = db.query(User).filter(User.email_id == data.email_id).first()
     if existing:
         raise HTTPException(
@@ -130,10 +105,7 @@ def create_instructor(db: Session, data: AdminCreateInstructor) -> Instructor:
     return new_instructor
 
 
-# ==================== PROFILE FETCHERS ====================
-
 def get_student_profile(db: Session, user_id: int) -> dict:
-    """Fetch student profile by user_id (from JWT)."""
     student = db.query(Student).filter(Student.user_id == user_id).first()
     if not student:
         raise HTTPException(
@@ -152,7 +124,6 @@ def get_student_profile(db: Session, user_id: int) -> dict:
 
 
 def get_instructor_profile(db: Session, user_id: int) -> dict:
-    """Fetch instructor profile by user_id (from JWT)."""
     instructor = db.query(Instructor).filter(Instructor.user_id == user_id).first()
     if not instructor:
         raise HTTPException(
@@ -168,10 +139,7 @@ def get_instructor_profile(db: Session, user_id: int) -> dict:
     }
 
 
-# ==================== ADMIN: LIST / REMOVE ====================
-
 def get_all_students(db: Session) -> list[dict]:
-    """Admin fetches all students with their user info."""
     students = db.query(Student).all()
     return [
         {
@@ -188,7 +156,6 @@ def get_all_students(db: Session) -> list[dict]:
 
 
 def get_all_instructors(db: Session) -> list[dict]:
-    """Admin fetches all instructors with their user info."""
     instructors = db.query(Instructor).all()
     return [
         {
@@ -203,11 +170,9 @@ def get_all_instructors(db: Session) -> list[dict]:
 
 
 def get_student_by_id(db: Session, student_id: int) -> dict:
-    """Fetch a single student by student_id (admin use)."""
     student = db.query(Student).filter(Student.student_id == student_id).first()
     if not student:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
-    # Also fetch their enrollments
     from app.models.enrollment import Enrollment
     enrollments = db.query(Enrollment).filter(Enrollment.student_id == student_id).all()
     return {
@@ -230,7 +195,6 @@ def get_student_by_id(db: Session, student_id: int) -> dict:
 
 
 def get_instructor_by_id(db: Session, instructor_id: int) -> dict:
-    """Fetch a single instructor by instructor_id (admin use)."""
     instructor = db.query(Instructor).filter(Instructor.instructor_id == instructor_id).first()
     if not instructor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Instructor not found")
@@ -255,7 +219,6 @@ def get_instructor_by_id(db: Session, instructor_id: int) -> dict:
 
 
 def remove_student(db: Session, student_id: int) -> None:
-    """Admin removes a student and their associated user account."""
     student = db.query(Student).filter(Student.student_id == student_id).first()
     if not student:
         raise HTTPException(
@@ -264,7 +227,6 @@ def remove_student(db: Session, student_id: int) -> None:
         )
     user = db.query(User).filter(User.user_id == student.user_id).first()
 
-    # Delete enrollments first (FK constraint)
     from app.models.enrollment import Enrollment
     db.query(Enrollment).filter(Enrollment.student_id == student_id).delete()
 
@@ -275,13 +237,11 @@ def remove_student(db: Session, student_id: int) -> None:
 
 
 def remove_instructor(db: Session, instructor_id: int) -> None:
-    """Admin removes an instructor and their associated user account."""
     instructor = db.query(Instructor).filter(Instructor.instructor_id == instructor_id).first()
     if not instructor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Instructor not found")
     user = db.query(User).filter(User.user_id == instructor.user_id).first()
 
-    # Delete courses assigned to instructor or unassign them (here we unassign)
     from app.models.course import Course
     db.query(Course).filter(Course.instructor_id == instructor_id).update({Course.instructor_id: None})
 

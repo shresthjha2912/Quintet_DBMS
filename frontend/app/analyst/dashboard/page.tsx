@@ -34,7 +34,7 @@ import {
   Legend,
 } from "recharts"
 
-/* ---------- types ---------- */
+
 interface Statistics {
   total_students: number
   total_instructors: number
@@ -661,7 +661,7 @@ export default function AnalystDashboard() {
                           <p className="text-xs font-medium text-muted-foreground">Textbooks</p>
                           <div className="space-y-1 mt-1">
                             {courseDetail.textbooks.map((tb) => (
-                              <p key={tb.title} className="text-sm">📖 <span className="font-medium">{tb.title}</span> <span className="text-muted-foreground">by {tb.author}</span></p>
+                              <p key={tb.title} className="text-sm"><span className="font-medium">{tb.title}</span> <span className="text-muted-foreground">by {tb.author}</span></p>
                             ))}
                           </div>
                         </div>

@@ -16,7 +16,6 @@ class EnrollmentResponse(BaseModel):
 
 
 class EnrollmentWithDetails(BaseModel):
-    """Enrollment with course name for student profile view"""
     student_id: int
     course_id: int
     course_name: str

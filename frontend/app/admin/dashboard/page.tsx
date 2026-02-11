@@ -29,7 +29,7 @@ import {
   getPublicCourses,
 } from "@/lib/api"
 
-/* ---------- types ---------- */
+
 interface Instructor {
   instructor_id: number
   user_id: number
@@ -57,7 +57,7 @@ interface Course {
   university_id: number
 }
 
-/* ---------- Detail types ---------- */
+
 interface InstructorDetail {
   instructor_id: number
   user_id: number
@@ -91,7 +91,7 @@ interface CourseDetail {
   enrolled_students: { student_id: number; student_email: string | null; evaluation_score: number }[]
 }
 
-/* ---------- page ---------- */
+
 export default function AdminDashboard() {
   const [tab, setTab] = useState<"instructors" | "courses" | "students">("instructors")
 
@@ -101,7 +101,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
-  // Detail state
   const [selectedInstructor, setSelectedInstructor] = useState<InstructorDetail | null>(null)
   const [selectedStudent, setSelectedStudent] = useState<StudentDetail | null>(null)
   const [selectedCourse, setSelectedCourse] = useState<CourseDetail | null>(null)
@@ -182,7 +181,7 @@ export default function AdminDashboard() {
         <p className="text-destructive">{error}</p>
       ) : (
         <div className="space-y-6">
-          {/* Summary cards */}
+
           <div className="grid gap-4 sm:grid-cols-3">
             <Card className="cursor-pointer hover:ring-2 hover:ring-primary/30" onClick={() => setTab("instructors")}>
               <CardHeader className="pb-2">
@@ -204,7 +203,7 @@ export default function AdminDashboard() {
             </Card>
           </div>
 
-          {/* Tab buttons */}
+
           <div className="flex gap-2">
             {(["instructors", "courses", "students"] as const).map((t) => (
               <Button key={t} variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)} className="capitalize">
@@ -213,7 +212,7 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* ── Instructors tab ── */}
+
           {tab === "instructors" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -250,7 +249,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ── Courses tab ── */}
+
           {tab === "courses" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -287,7 +286,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ── Students tab ── */}
+
           {tab === "students" && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Students</h2>
@@ -321,7 +320,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ── Detail Dialog ── */}
+
           <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               {detailLoading ? (
@@ -499,7 +498,6 @@ export default function AdminDashboard() {
   )
 }
 
-/* ===== Dialogs ===== */
 
 function CreateInstructorDialog({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false)

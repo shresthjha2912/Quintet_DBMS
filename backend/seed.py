@@ -1,7 +1,3 @@
-"""
-Seed script — populates ALL tables with sample data.
-Run:  cd backend && .venv/bin/python seed.py
-"""
 
 from app.database import SessionLocal, engine, Base
 from app.core.security import hash_password
@@ -17,49 +13,40 @@ from app.models.textbook import Textbook
 from app.models.course_topic import CourseTopic
 from app.models.textbook_used import TextbookUsed
 
-# Make sure tables exist
 Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
 
 try:
-    # ── 1. Users ─────────────────────────────────────────────────
-    # Admin already seeded by app startup; add instructors, students, analysts
     users_data = [
-        # Instructors (user_id will auto-increment; admin is 1)
         {"email_id": "andrew.ng@quintet.com",       "role": "instructor", "password": hash_password("instructor123")},
         {"email_id": "jamesgosling@quintet.com",     "role": "instructor", "password": hash_password("instructor123")},
         {"email_id": "linus.torvalds@quintet.com",   "role": "instructor", "password": hash_password("instructor123")},
         {"email_id": "fei.fei.li@quintet.com",       "role": "instructor", "password": hash_password("instructor123")},
         {"email_id": "tim.berners@quintet.com",      "role": "instructor", "password": hash_password("instructor123")},
-        # Students
         {"email_id": "rahul.sharma@student.com",     "role": "student",    "password": hash_password("student123")},
         {"email_id": "priya.patel@student.com",      "role": "student",    "password": hash_password("student123")},
         {"email_id": "john.doe@student.com",         "role": "student",    "password": hash_password("student123")},
         {"email_id": "alice.wang@student.com",       "role": "student",    "password": hash_password("student123")},
         {"email_id": "bob.martin@student.com",       "role": "student",    "password": hash_password("student123")},
-        # Analysts
         {"email_id": "analyst1@quintet.com",         "role": "analyst",    "password": hash_password("analyst123")},
         {"email_id": "analyst2@quintet.com",         "role": "analyst",    "password": hash_password("analyst123")},
     ]
 
-    # Check if data already seeded (look for first instructor)
     existing = db.query(User).filter(User.email_id == "andrew.ng@quintet.com").first()
     if existing:
-        print("⚠️  Data already seeded. Skipping.")
+        print("  Data already seeded. Skipping.")
         exit(0)
 
     for u in users_data:
         db.add(User(**u))
-    db.flush()  # so user_ids are assigned
+    db.flush()
 
-    # Fetch the user_ids
     instructor_users = db.query(User).filter(User.role == "instructor").order_by(User.user_id).all()
     student_users = db.query(User).filter(User.role == "student").order_by(User.user_id).all()
 
-    print(f"✅ Created {len(users_data)} users")
+    print(f"Created {len(users_data)} users")
 
-    # ── 2. Instructors ───────────────────────────────────────────
     instructors_data = [
         {"user_id": instructor_users[0].user_id, "name": "Andrew Ng",        "expertise": "Machine Learning"},
         {"user_id": instructor_users[1].user_id, "name": "James Gosling",    "expertise": "Java & Software Engineering"},
@@ -73,9 +60,8 @@ try:
     db.flush()
 
     instructors = db.query(Instructor).order_by(Instructor.instructor_id).all()
-    print(f"✅ Created {len(instructors_data)} instructors")
+    print(f"Created {len(instructors_data)} instructors")
 
-    # ── 3. Students ──────────────────────────────────────────────
     students_data = [
         {"user_id": student_users[0].user_id, "age": 21, "skill_level": "Intermediate", "category": "Undergraduate", "country": "India"},
         {"user_id": student_users[1].user_id, "age": 23, "skill_level": "Beginner",     "category": "Postgraduate",  "country": "India"},
@@ -89,9 +75,8 @@ try:
     db.flush()
 
     students = db.query(Student).order_by(Student.student_id).all()
-    print(f"✅ Created {len(students_data)} students")
+    print(f"Created {len(students_data)} students")
 
-    # ── 4. Universities ──────────────────────────────────────────
     universities_data = [
         {"name": "IIT Kharagpur",                              "country": "India"},
         {"name": "Stanford University",                        "country": "USA"},
@@ -105,9 +90,8 @@ try:
     db.flush()
 
     universities = db.query(University).order_by(University.university_id).all()
-    print(f"✅ Created {len(universities_data)} universities")
+    print(f"Created {len(universities_data)} universities")
 
-    # ── 5. Courses ───────────────────────────────────────────────
     courses_data = [
         {"course_name": "Machine Learning",              "duration": "12 weeks", "program_type": "Certificate",  "instructor_id": instructors[0].instructor_id, "university_id": universities[1].university_id},
         {"course_name": "Deep Learning Specialization",  "duration": "16 weeks", "program_type": "Specialization","instructor_id": instructors[0].instructor_id, "university_id": universities[1].university_id},
@@ -126,9 +110,8 @@ try:
     db.flush()
 
     courses = db.query(Course).order_by(Course.course_id).all()
-    print(f"✅ Created {len(courses_data)} courses")
+    print(f"Created {len(courses_data)} courses")
 
-    # ── 6. Topics ────────────────────────────────────────────────
     topics_data = [
         {"topic_name": "Supervised Learning"},
         {"topic_name": "Neural Networks"},
@@ -147,9 +130,8 @@ try:
     db.flush()
 
     topics = db.query(Topic).order_by(Topic.topic_id).all()
-    print(f"✅ Created {len(topics_data)} topics")
+    print(f"Created {len(topics_data)} topics")
 
-    # ── 7. Textbooks ─────────────────────────────────────────────
     textbooks_data = [
         {"title": "Pattern Recognition and Machine Learning", "author": "Christopher Bishop", "link": "https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf"},
         {"title": "Deep Learning",                            "author": "Ian Goodfellow", "link": "https://www.deeplearningbook.org/"},
@@ -166,94 +148,81 @@ try:
     db.flush()
 
     textbooks = db.query(Textbook).order_by(Textbook.textbook_id).all()
-    print(f"✅ Created {len(textbooks_data)} textbooks")
+    print(f"Created {len(textbooks_data)} textbooks")
 
-    # ── 8. Course ↔ Topic links ──────────────────────────────────
     course_topics_data = [
-        {"course_id": courses[0].course_id, "topic_id": topics[0].topic_id},  # ML → Supervised Learning
-        {"course_id": courses[0].course_id, "topic_id": topics[1].topic_id},  # ML → Neural Networks
-        {"course_id": courses[1].course_id, "topic_id": topics[1].topic_id},  # Deep Learning → Neural Networks
-        {"course_id": courses[1].course_id, "topic_id": topics[5].topic_id},  # Deep Learning → Image Recognition
-        {"course_id": courses[2].course_id, "topic_id": topics[2].topic_id},  # Java → OOP
-        {"course_id": courses[2].course_id, "topic_id": topics[3].topic_id},  # Java → DSA
-        {"course_id": courses[3].course_id, "topic_id": topics[2].topic_id},  # SE Principles → OOP
-        {"course_id": courses[4].course_id, "topic_id": topics[4].topic_id},  # Linux Kernel → Process Management
-        {"course_id": courses[5].course_id, "topic_id": topics[4].topic_id},  # OS → Process Management
-        {"course_id": courses[6].course_id, "topic_id": topics[5].topic_id},  # CV → Image Recognition
-        {"course_id": courses[6].course_id, "topic_id": topics[1].topic_id},  # CV → Neural Networks
-        {"course_id": courses[7].course_id, "topic_id": topics[0].topic_id},  # Intro AI → Supervised Learning
-        {"course_id": courses[7].course_id, "topic_id": topics[8].topic_id},  # Intro AI → NLP
-        {"course_id": courses[8].course_id, "topic_id": topics[6].topic_id},  # Web Dev → HTML/CSS/JS
-        {"course_id": courses[8].course_id, "topic_id": topics[7].topic_id},  # Web Dev → REST APIs
-        {"course_id": courses[9].course_id, "topic_id": topics[6].topic_id},  # Full-Stack → HTML/CSS/JS
-        {"course_id": courses[9].course_id, "topic_id": topics[7].topic_id},  # Full-Stack → REST APIs
-        {"course_id": courses[9].course_id, "topic_id": topics[9].topic_id},  # Full-Stack → Cloud Computing
+        {"course_id": courses[0].course_id, "topic_id": topics[0].topic_id},
+        {"course_id": courses[0].course_id, "topic_id": topics[1].topic_id},
+        {"course_id": courses[1].course_id, "topic_id": topics[1].topic_id},
+        {"course_id": courses[1].course_id, "topic_id": topics[5].topic_id},
+        {"course_id": courses[2].course_id, "topic_id": topics[2].topic_id},
+        {"course_id": courses[2].course_id, "topic_id": topics[3].topic_id},
+        {"course_id": courses[3].course_id, "topic_id": topics[2].topic_id},
+        {"course_id": courses[4].course_id, "topic_id": topics[4].topic_id},
+        {"course_id": courses[5].course_id, "topic_id": topics[4].topic_id},
+        {"course_id": courses[6].course_id, "topic_id": topics[5].topic_id},
+        {"course_id": courses[6].course_id, "topic_id": topics[1].topic_id},
+        {"course_id": courses[7].course_id, "topic_id": topics[0].topic_id},
+        {"course_id": courses[7].course_id, "topic_id": topics[8].topic_id},
+        {"course_id": courses[8].course_id, "topic_id": topics[6].topic_id},
+        {"course_id": courses[8].course_id, "topic_id": topics[7].topic_id},
+        {"course_id": courses[9].course_id, "topic_id": topics[6].topic_id},
+        {"course_id": courses[9].course_id, "topic_id": topics[7].topic_id},
+        {"course_id": courses[9].course_id, "topic_id": topics[9].topic_id},
     ]
 
     for ct in course_topics_data:
         db.add(CourseTopic(**ct))
     db.flush()
-    print(f"✅ Created {len(course_topics_data)} course-topic links")
+    print(f"Created {len(course_topics_data)} course-topic links")
 
-    # ── 9. Textbook ↔ Course links ───────────────────────────────
     textbooks_used_data = [
-        {"course_id": courses[0].course_id, "textbook_id": textbooks[0].textbook_id},  # ML → Bishop
-        {"course_id": courses[1].course_id, "textbook_id": textbooks[1].textbook_id},  # Deep Learning → Goodfellow
-        {"course_id": courses[2].course_id, "textbook_id": textbooks[2].textbook_id},  # Java → Effective Java
-        {"course_id": courses[2].course_id, "textbook_id": textbooks[5].textbook_id},  # Java → Clean Code
-        {"course_id": courses[3].course_id, "textbook_id": textbooks[5].textbook_id},  # SE → Clean Code
-        {"course_id": courses[3].course_id, "textbook_id": textbooks[6].textbook_id},  # SE → CLRS
-        {"course_id": courses[4].course_id, "textbook_id": textbooks[3].textbook_id},  # Linux → Silberschatz
-        {"course_id": courses[5].course_id, "textbook_id": textbooks[3].textbook_id},  # OS → Silberschatz
-        {"course_id": courses[6].course_id, "textbook_id": textbooks[4].textbook_id},  # CV → Szeliski
-        {"course_id": courses[6].course_id, "textbook_id": textbooks[1].textbook_id},  # CV → Goodfellow
-        {"course_id": courses[7].course_id, "textbook_id": textbooks[0].textbook_id},  # Intro AI → Bishop
-        {"course_id": courses[8].course_id, "textbook_id": textbooks[7].textbook_id},  # Web Dev → Duckett
-        {"course_id": courses[9].course_id, "textbook_id": textbooks[7].textbook_id},  # Full-Stack → Duckett
+        {"course_id": courses[0].course_id, "textbook_id": textbooks[0].textbook_id},
+        {"course_id": courses[1].course_id, "textbook_id": textbooks[1].textbook_id},
+        {"course_id": courses[2].course_id, "textbook_id": textbooks[2].textbook_id},
+        {"course_id": courses[2].course_id, "textbook_id": textbooks[5].textbook_id},
+        {"course_id": courses[3].course_id, "textbook_id": textbooks[5].textbook_id},
+        {"course_id": courses[3].course_id, "textbook_id": textbooks[6].textbook_id},
+        {"course_id": courses[4].course_id, "textbook_id": textbooks[3].textbook_id},
+        {"course_id": courses[5].course_id, "textbook_id": textbooks[3].textbook_id},
+        {"course_id": courses[6].course_id, "textbook_id": textbooks[4].textbook_id},
+        {"course_id": courses[6].course_id, "textbook_id": textbooks[1].textbook_id},
+        {"course_id": courses[7].course_id, "textbook_id": textbooks[0].textbook_id},
+        {"course_id": courses[8].course_id, "textbook_id": textbooks[7].textbook_id},
+        {"course_id": courses[9].course_id, "textbook_id": textbooks[7].textbook_id},
     ]
 
     for tu in textbooks_used_data:
         db.add(TextbookUsed(**tu))
     db.flush()
-    print(f"✅ Created {len(textbooks_used_data)} textbook-course links")
+    print(f"Created {len(textbooks_used_data)} textbook-course links")
 
-    # ── 10. Contents (real working links) ────────────────────────
     contents_data = [
-        # Machine Learning
         {"course_id": courses[0].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=jGwO_UgTS7I"},
         {"course_id": courses[0].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Machine_learning"},
         {"course_id": courses[0].course_id, "type": "pdf",     "content_url": "https://arxiv.org/pdf/2303.18223"},
-        # Deep Learning Specialization
         {"course_id": courses[1].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=CS4cs9xVecg"},
         {"course_id": courses[1].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Deep_learning"},
         {"course_id": courses[1].course_id, "type": "pdf",     "content_url": "https://arxiv.org/pdf/1706.03762"},
-        # Java Programming
         {"course_id": courses[2].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=eIrMbAQSU34"},
         {"course_id": courses[2].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Java_(programming_language)"},
         {"course_id": courses[2].course_id, "type": "link",    "content_url": "https://docs.oracle.com/javase/tutorial/"},
-        # Software Engineering Principles
         {"course_id": courses[3].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=O753uuutqH8"},
         {"course_id": courses[3].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Software_engineering"},
-        # Linux Kernel Development
         {"course_id": courses[4].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=WnGG-MhY9Os"},
         {"course_id": courses[4].course_id, "type": "link",    "content_url": "https://www.kernel.org/doc/html/latest/"},
         {"course_id": courses[4].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Linux_kernel"},
-        # Operating Systems
         {"course_id": courses[5].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=vBURTt97EkA"},
         {"course_id": courses[5].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Operating_system"},
         {"course_id": courses[5].course_id, "type": "pdf",     "content_url": "https://pages.cs.wisc.edu/~remzi/OSTEP/intro.pdf"},
-        # Computer Vision with Deep Learning
         {"course_id": courses[6].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=dJYGatp4SvA"},
         {"course_id": courses[6].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Computer_vision"},
-        # Introduction to AI
         {"course_id": courses[7].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=JMUxmLyrhSk"},
         {"course_id": courses[7].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Artificial_intelligence"},
         {"course_id": courses[7].course_id, "type": "pdf",     "content_url": "https://arxiv.org/pdf/2108.07258"},
-        # Web Development Fundamentals
         {"course_id": courses[8].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=UB1O30fR-EE"},
         {"course_id": courses[8].course_id, "type": "link",    "content_url": "https://developer.mozilla.org/en-US/docs/Learn"},
         {"course_id": courses[8].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Web_development"},
-        # Full-Stack Web Applications
         {"course_id": courses[9].course_id, "type": "video",   "content_url": "https://www.youtube.com/watch?v=nu_pCVPKzTk"},
         {"course_id": courses[9].course_id, "type": "link",    "content_url": "https://nextjs.org/docs"},
         {"course_id": courses[9].course_id, "type": "article", "content_url": "https://en.wikipedia.org/wiki/Solution_stack"},
@@ -262,9 +231,8 @@ try:
     for c in contents_data:
         db.add(Content(**c))
     db.flush()
-    print(f"✅ Created {len(contents_data)} content items")
+    print(f"Created {len(contents_data)} content items")
 
-    # ── 11. Enrollments ──────────────────────────────────────────
     enrollments_data = [
         {"student_id": students[0].student_id, "course_id": courses[0].course_id, "evaluation_score": 88.5},
         {"student_id": students[0].student_id, "course_id": courses[2].course_id, "evaluation_score": 75.0},
@@ -284,20 +252,19 @@ try:
     for e in enrollments_data:
         db.add(Enrollment(**e))
     db.flush()
-    print(f"✅ Created {len(enrollments_data)} enrollments")
+    print(f"Created {len(enrollments_data)} enrollments")
 
-    # ── Commit everything ────────────────────────────────────────
     db.commit()
-    print("\n🎉 All sample data seeded successfully!")
-    print("\n📋 Login credentials:")
-    print("   Admin:       admin@quintet.com / admin123")
-    print("   Instructors: andrew.ng@quintet.com / instructor123  (and 4 others)")
-    print("   Students:    rahul.sharma@student.com / student123  (and 4 others)")
-    print("   Analysts:    analyst1@quintet.com / analyst123")
+    print("\nAll sample data seeded successfully!")
+    print("\nLogin credentials:")
+    print("  Admin:       admin@quintet.com / admin123")
+    print("  Instructors: andrew.ng@quintet.com / instructor123  (and 4 others)")
+    print("  Students:    rahul.sharma@student.com / student123  (and 4 others)")
+    print("  Analysts:    analyst1@quintet.com / analyst123")
 
 except Exception as e:
     db.rollback()
-    print(f"❌ Error: {e}")
+    print(f"Error: {e}")
     raise
 finally:
     db.close()

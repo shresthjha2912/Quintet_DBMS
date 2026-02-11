@@ -89,7 +89,6 @@ export default function StudentDashboard() {
   const availableCourses = courses.filter((c) => !enrolledCourseIds.has(c.course_id))
   const enrolledCourses = courses.filter((c) => enrolledCourseIds.has(c.course_id))
 
-  // Filter courses by search query (prefix match — shows courses starting with typed text)
   const filteredBrowse = searchQuery
     ? availableCourses.filter((c) =>
         c.course_name.toLowerCase().startsWith(searchQuery.toLowerCase())
@@ -110,7 +109,7 @@ export default function StudentDashboard() {
         <p className="text-destructive">{error}</p>
       ) : (
         <div className="space-y-8">
-          {/* Profile card */}
+
           {profile && (
             <Card>
               <CardHeader>
@@ -148,7 +147,7 @@ export default function StudentDashboard() {
             </Card>
           )}
 
-          {/* Search bar */}
+
           <div className="relative">
             <Input
               placeholder="Search courses by name…"
@@ -161,12 +160,12 @@ export default function StudentDashboard() {
                 onClick={() => setSearchQuery("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
               >
-                ✕
+                
               </button>
             )}
           </div>
 
-          {/* Tabs */}
+
           <div className="flex gap-2">
             <Button
               variant={tab === "my-courses" ? "default" : "outline"}

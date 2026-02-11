@@ -14,7 +14,6 @@ from app.models.textbook_used import TextbookUsed
 
 
 def get_general_statistics(db: Session) -> dict:
-    """General statistics of the entire database."""
     total_students = db.query(func.count(Student.student_id)).scalar()
     total_instructors = db.query(func.count(Instructor.instructor_id)).scalar()
     total_courses = db.query(func.count(Course.course_id)).scalar()
@@ -24,7 +23,6 @@ def get_general_statistics(db: Session) -> dict:
 
     avg_evaluation = db.query(func.avg(Enrollment.evaluation_score)).scalar()
 
-    # Courses per university
     courses_per_university = (
         db.query(
             University.name,
@@ -35,7 +33,6 @@ def get_general_statistics(db: Session) -> dict:
         .all()
     )
 
-    # Students per country
     students_per_country = (
         db.query(
             Student.country,
@@ -45,7 +42,6 @@ def get_general_statistics(db: Session) -> dict:
         .all()
     )
 
-    # Students per skill level
     students_per_skill = (
         db.query(
             Student.skill_level,
@@ -55,7 +51,6 @@ def get_general_statistics(db: Session) -> dict:
         .all()
     )
 
-    # Score distribution (0-20, 21-40, 41-60, 61-80, 81-100)
     score_distribution = []
     for lo, hi, label in [(0, 20, "0-20"), (21, 40, "21-40"), (41, 60, "41-60"), (61, 80, "61-80"), (81, 100, "81-100")]:
         cnt = db.query(func.count()).select_from(Enrollment).filter(
@@ -64,25 +59,21 @@ def get_general_statistics(db: Session) -> dict:
         ).scalar()
         score_distribution.append({"range": label, "count": cnt or 0})
 
-    # Pass/fail (>= 40 is pass)
     pass_count = db.query(func.count()).select_from(Enrollment).filter(Enrollment.evaluation_score >= 40).scalar() or 0
     fail_count = (total_enrollments or 0) - pass_count
 
-    # Students per category
     students_per_category = (
         db.query(Student.category, func.count(Student.student_id))
         .group_by(Student.category)
         .all()
     )
 
-    # Courses per program type
     courses_per_program = (
         db.query(Course.program_type, func.count(Course.course_id))
         .group_by(Course.program_type)
         .all()
     )
 
-    # Average score per program type
     avg_score_per_program = (
         db.query(Course.program_type, func.avg(Enrollment.evaluation_score))
         .join(Enrollment, Enrollment.course_id == Course.course_id)
@@ -129,7 +120,6 @@ def get_general_statistics(db: Session) -> dict:
 
 
 def get_courses_summary(db: Session) -> list[dict]:
-    """Per-course statistics: enrollment count, avg score, instructor name."""
     courses = db.query(Course).all()
     result = []
     for course in courses:
@@ -185,13 +175,11 @@ def get_courses_summary(db: Session) -> list[dict]:
 
 
 def get_enrollments_summary(db: Session) -> dict:
-    """Enrollment-level aggregate statistics."""
     total = db.query(func.count()).select_from(Enrollment).scalar()
     avg_score = db.query(func.avg(Enrollment.evaluation_score)).scalar()
     max_score = db.query(func.max(Enrollment.evaluation_score)).scalar()
     min_score = db.query(func.min(Enrollment.evaluation_score)).scalar()
 
-    # Top 5 most enrolled courses
     top_courses = (
         db.query(
             Course.course_name,
@@ -217,12 +205,10 @@ def get_enrollments_summary(db: Session) -> dict:
 
 
 def get_course_detail_for_analyst(db: Session, course_id: int) -> dict:
-    """Deep analytics for a single course — used by analyst drill-down."""
     course = db.query(Course).filter(Course.course_id == course_id).first()
     if not course:
         return {}
 
-    # Enrolled students with their details
     rows = (
         db.query(Enrollment, Student, User)
         .join(Student, Enrollment.student_id == Student.student_id)
@@ -245,7 +231,6 @@ def get_course_detail_for_analyst(db: Session, course_id: int) -> dict:
             "evaluation_score": enroll.evaluation_score,
         })
 
-    # Topics
     topics = (
         db.query(Topic.topic_name)
         .join(CourseTopic, CourseTopic.topic_id == Topic.topic_id)
@@ -253,7 +238,6 @@ def get_course_detail_for_analyst(db: Session, course_id: int) -> dict:
         .all()
     )
 
-    # Textbooks
     textbooks = (
         db.query(Textbook)
         .join(TextbookUsed, TextbookUsed.textbook_id == Textbook.textbook_id)
@@ -261,7 +245,6 @@ def get_course_detail_for_analyst(db: Session, course_id: int) -> dict:
         .all()
     )
 
-    # Content counts by type
     content_by_type = (
         db.query(Content.type, func.count(Content.content_id))
         .filter(Content.course_id == course_id)
@@ -269,7 +252,6 @@ def get_course_detail_for_analyst(db: Session, course_id: int) -> dict:
         .all()
     )
 
-    # Score distribution for this course
     score_dist = []
     for lo, hi, label in [(0, 20, "0-20"), (21, 40, "21-40"), (41, 60, "41-60"), (61, 80, "61-80"), (81, 100, "81-100")]:
         cnt = db.query(func.count()).select_from(Enrollment).filter(
@@ -279,7 +261,6 @@ def get_course_detail_for_analyst(db: Session, course_id: int) -> dict:
         ).scalar()
         score_dist.append({"range": label, "count": cnt or 0})
 
-    # Skill level breakdown among enrolled students
     skill_breakdown = (
         db.query(Student.skill_level, func.count(Student.student_id))
         .join(Enrollment, Enrollment.student_id == Student.student_id)
@@ -323,14 +304,12 @@ def get_course_detail_for_analyst(db: Session, course_id: int) -> dict:
 
 
 def get_student_detail_for_analyst(db: Session, student_id: int) -> dict:
-    """Deep analytics for a single student — used by analyst drill-down."""
     student = db.query(Student).filter(Student.student_id == student_id).first()
     if not student:
         return {}
 
     user = db.query(User).filter(User.user_id == student.user_id).first()
 
-    # All enrollments with course details
     rows = (
         db.query(Enrollment, Course, University.name, Instructor.name)
         .join(Course, Enrollment.course_id == Course.course_id)

@@ -8,9 +8,8 @@ class User(Base):
 
     user_id = Column(Integer, primary_key=True, index=True)
     email_id = Column(String, unique=True, index=True, nullable=False)
-    role = Column(String, nullable=False)  # "student", "instructor", "analyst", "admin"
+    role = Column(String, nullable=False)
     password = Column(String, nullable=False)
 
-    # Relationships
     student = relationship("Student", back_populates="user", uselist=False)
     instructor = relationship("Instructor", back_populates="user", uselist=False)

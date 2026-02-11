@@ -55,7 +55,7 @@ export default function InstructorDashboard() {
         <p className="text-destructive">{error}</p>
       ) : (
         <div className="space-y-8">
-          {/* Profile */}
+
           {profile && (
             <Card>
               <CardHeader>
@@ -85,7 +85,7 @@ export default function InstructorDashboard() {
             </Card>
           )}
 
-          {/* Courses */}
+
           <div>
             <h2 className="mb-4 text-xl font-semibold text-foreground">
               My Courses ({courses.length})

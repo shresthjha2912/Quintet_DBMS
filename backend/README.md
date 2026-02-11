@@ -32,12 +32,12 @@ Once running, visit:
 
 ```
 app/
-├── main.py          ← FastAPI entry point
-├── database.py      ← PostgreSQL connection
-├── core/            ← Settings & security
-├── models/          ← SQLAlchemy DB models
-├── schemas/         ← Pydantic request/response models
-├── routers/         ← API endpoints
-├── services/        ← Business logic
-└── tests/           ← Unit tests
+ main.py          ← FastAPI entry point
+ database.py      ← PostgreSQL connection
+ core/            ← Settings & security
+ models/          ← SQLAlchemy DB models
+ schemas/         ← Pydantic request/response models
+ routers/         ← API endpoints
+ services/        ← Business logic
+ tests/           ← Unit tests
 ```

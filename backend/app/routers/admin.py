@@ -28,15 +28,12 @@ from app.schemas.enrollment import EnrollmentCreate
 router = APIRouter()
 
 
-# ==================== INSTRUCTOR MANAGEMENT ====================
-
 @router.post("/instructors", status_code=201)
 async def admin_create_instructor(
     data: AdminCreateInstructor,
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin creates a new instructor (User + Instructor record)."""
     return create_instructor(db, data)
 
 
@@ -45,7 +42,6 @@ async def list_instructors(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin lists all instructors."""
     return get_all_instructors(db)
 
 
@@ -55,11 +51,8 @@ async def get_instructor_detail(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin views a single instructor with their courses."""
     return get_instructor_by_id(db, instructor_id)
 
-
-# ==================== COURSE MANAGEMENT ====================
 
 @router.post("/courses", status_code=201)
 async def admin_create_course(
@@ -67,7 +60,6 @@ async def admin_create_course(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin creates a new course."""
     from app.schemas.course import CourseCreate
     course_create = CourseCreate(
         course_name=data.course_name,
@@ -85,7 +77,6 @@ async def admin_get_course_detail(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin views a single course with instructor info and enrolled students."""
     return get_course_detail(db, course_id)
 
 
@@ -95,7 +86,6 @@ async def admin_delete_course(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin deletes a course."""
     delete_course(db, course_id)
     return {"message": f"Course {course_id} deleted successfully"}
 
@@ -106,18 +96,14 @@ async def assign_instructor_to_course(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin assigns an instructor to a course."""
     return assign_instructor(db, data.course_id, data.instructor_id)
 
-
-# ==================== STUDENT MANAGEMENT ====================
 
 @router.get("/students")
 async def list_students(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin lists all students."""
     return get_all_students(db)
 
 
@@ -127,7 +113,6 @@ async def get_student_detail(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin views a single student with their enrollments."""
     return get_student_by_id(db, student_id)
 
 
@@ -137,7 +122,6 @@ async def admin_remove_student(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin removes a student."""
     remove_student(db, student_id)
     return {"message": f"Student {student_id} removed successfully"}
 
@@ -149,7 +133,6 @@ async def admin_enroll_student(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin enrolls a student in a course."""
     enrollment_data = EnrollmentCreate(student_id=student_id, course_id=course_id)
     return enroll_student(db, enrollment_data)
 
@@ -161,10 +144,8 @@ async def admin_drop_student(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin drops a student from a course."""
     drop_student(db, student_id, course_id)
     return {"message": f"Student {student_id} dropped from course {course_id}"}
-
 
 
 @router.delete("/instructors/{instructor_id}")
@@ -173,6 +154,5 @@ async def admin_remove_instructor(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ):
-    """Admin removes an instructor and their user account."""
     remove_instructor(db, instructor_id)
     return {"message": f"Instructor {instructor_id} removed successfully"}

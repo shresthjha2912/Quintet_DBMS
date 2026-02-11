@@ -2,7 +2,7 @@
 
 Quintet is a comprehensive course management system with a FastAPI backend and a Next.js frontend, integrated with Supabase PostgreSQL.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Prerequisites
 - Python 3.13+
@@ -40,7 +40,7 @@ pnpm dev
 ```
 The app will be available at `http://localhost:3000`.
 
-## 📂 Project Structure
+##  Project Structure
 
 - **`/backend`**: FastAPI application
   - `app/models`: SQLAlchemy database models (11 tables)
@@ -52,7 +52,7 @@ The app will be available at `http://localhost:3000`.
   - `lib/api.ts`: Centralized API client
   - `components/ui`: Shadcn/UI component library
 
-## 🔐 Role-Based Access
+##  Role-Based Access
 
 | Role | Access Level |
 |---|---|
@@ -61,7 +61,7 @@ The app will be available at `http://localhost:3000`.
 | **Student** | Browse and enroll in courses, track progress |
 | **Analyst** | Access system-wide analytics and visualizations |
 
-## 🛠 Tech Stack
+##  Tech Stack
 - **Backend**: FastAPI, SQLAlchemy, Pydantic, JWT, Bcrypt
 - **Frontend**: Next.js (App Router), TypeScript, Tailwind CSS, Shadcn/UI, Recharts
 - **Database**: Cloud PostgreSQL (Supabase)

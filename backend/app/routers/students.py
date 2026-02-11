@@ -16,7 +16,6 @@ async def get_my_profile(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_student),
 ):
-    """Student views their own profile."""
     return get_student_profile(db, current_user["user_id"])
 
 
@@ -25,7 +24,6 @@ async def browse_courses(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_student),
 ):
-    """Student browses available courses to enroll in."""
     return get_all_courses(db)
 
 
@@ -35,7 +33,6 @@ async def add_course(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_student),
 ):
-    """Student enrolls in a course."""
     return enroll_student(db, enrollment)
 
 
@@ -45,7 +42,6 @@ async def unenroll_from_course(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_student),
 ):
-    """Student unenrolls (drops) themselves from a course."""
     from app.models.student import Student
     student = db.query(Student).filter(Student.user_id == current_user["user_id"]).first()
     if not student:
@@ -60,7 +56,6 @@ async def my_enrolled_courses(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_student),
 ):
-    """Student views their enrolled courses."""
     from app.models.student import Student
     student = db.query(Student).filter(Student.user_id == current_user["user_id"]).first()
     if not student:

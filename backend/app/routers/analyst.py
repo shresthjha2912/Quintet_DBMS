@@ -18,11 +18,6 @@ async def get_statistics(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_analyst),
 ):
-    """
-    Analyst views general statistics of the database:
-    - Total students, instructors, courses, enrollments
-    - Courses per university, avg evaluation scores, etc.
-    """
     return get_general_statistics(db)
 
 
@@ -31,7 +26,6 @@ async def courses_summary(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_analyst),
 ):
-    """Analyst views course-level statistics."""
     return get_courses_summary(db)
 
 
@@ -40,7 +34,6 @@ async def enrollments_summary(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_analyst),
 ):
-    """Analyst views enrollment statistics."""
     return get_enrollments_summary(db)
 
 
@@ -50,7 +43,6 @@ async def course_detail(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_analyst),
 ):
-    """Analyst views deep analytics for a single course, including enrolled students."""
     return get_course_detail_for_analyst(db, course_id)
 
 
@@ -60,5 +52,4 @@ async def student_detail(
     db: Session = Depends(get_db),
     current_user: dict = Depends(require_analyst),
 ):
-    """Analyst views deep analytics for a single student."""
     return get_student_detail_for_analyst(db, student_id)

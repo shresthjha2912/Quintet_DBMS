@@ -2,10 +2,7 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 
-# ---------- Auth Schemas ----------
-
 class UserLogin(BaseModel):
-    """Used by ALL roles: student, instructor, analyst, admin"""
     email_id: EmailStr
     password: str
 
@@ -23,10 +20,7 @@ class TokenData(BaseModel):
     user_id: Optional[int] = None
 
 
-# ---------- Student Signup ----------
-
 class StudentSignup(BaseModel):
-    """Only students can sign up"""
     email_id: EmailStr
     password: str
     age: int
@@ -34,8 +28,6 @@ class StudentSignup(BaseModel):
     category: str
     country: str
 
-
-# ---------- Response Schemas ----------
 
 class UserResponse(BaseModel):
     user_id: int
@@ -70,10 +62,7 @@ class InstructorProfile(BaseModel):
         from_attributes = True
 
 
-# ---------- Admin Schemas ----------
-
 class AdminCreateInstructor(BaseModel):
-    """Admin creates instructor accounts"""
     email_id: EmailStr
     password: str
     name: str
@@ -81,7 +70,6 @@ class AdminCreateInstructor(BaseModel):
 
 
 class AdminCreateCourse(BaseModel):
-    """Admin creates courses"""
     course_name: str
     duration: str
     program_type: str
@@ -90,6 +78,5 @@ class AdminCreateCourse(BaseModel):
 
 
 class AdminAssignInstructor(BaseModel):
-    """Admin assigns an instructor to a course"""
     course_id: int
     instructor_id: int

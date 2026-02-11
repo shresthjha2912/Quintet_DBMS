@@ -7,8 +7,6 @@ from app.schemas.enrollment import EnrollmentCreate
 
 
 def enroll_student(db: Session, enrollment_data: EnrollmentCreate) -> Enrollment:
-    """Enroll a student in a course."""
-    # Verify student exists
     student = db.query(Student).filter(
         Student.student_id == enrollment_data.student_id
     ).first()
@@ -18,7 +16,6 @@ def enroll_student(db: Session, enrollment_data: EnrollmentCreate) -> Enrollment
             detail="Student not found",
         )
 
-    # Verify course exists
     course = db.query(Course).filter(
         Course.course_id == enrollment_data.course_id
     ).first()
@@ -28,7 +25,6 @@ def enroll_student(db: Session, enrollment_data: EnrollmentCreate) -> Enrollment
             detail="Course not found",
         )
 
-    # Check if already enrolled
     existing = (
         db.query(Enrollment)
         .filter(
@@ -46,7 +42,7 @@ def enroll_student(db: Session, enrollment_data: EnrollmentCreate) -> Enrollment
     new_enrollment = Enrollment(
         student_id=enrollment_data.student_id,
         course_id=enrollment_data.course_id,
-        evaluation_score=0.0,  # default score on enrollment
+        evaluation_score=0.0,
     )
     db.add(new_enrollment)
     db.commit()
@@ -55,7 +51,6 @@ def enroll_student(db: Session, enrollment_data: EnrollmentCreate) -> Enrollment
 
 
 def drop_student(db: Session, student_id: int, course_id: int) -> None:
-    """Drop a student from a course."""
     enrollment = (
         db.query(Enrollment)
         .filter(
@@ -74,7 +69,6 @@ def drop_student(db: Session, student_id: int, course_id: int) -> None:
 
 
 def get_enrollments_by_student(db: Session, student_id: int) -> list[dict]:
-    """Get all enrollments for a given student, with course details."""
     enrollments = (
         db.query(Enrollment)
         .filter(Enrollment.student_id == student_id)
@@ -92,7 +86,6 @@ def get_enrollments_by_student(db: Session, student_id: int) -> list[dict]:
 
 
 def get_enrollments_by_course(db: Session, course_id: int) -> list[dict]:
-    """Get all enrollments for a given course, with student details."""
     enrollments = (
         db.query(Enrollment)
         .filter(Enrollment.course_id == course_id)
@@ -111,7 +104,6 @@ def get_enrollments_by_course(db: Session, course_id: int) -> list[dict]:
 
 
 def grade_student(db: Session, course_id: int, student_id: int, score: float) -> dict:
-    """Instructor assigns/updates evaluation score for a student's enrollment."""
     enrollment = (
         db.query(Enrollment)
         .filter(Enrollment.course_id == course_id, Enrollment.student_id == student_id)

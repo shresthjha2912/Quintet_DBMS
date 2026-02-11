@@ -14,6 +14,7 @@ import {
   getCourseTextbooks,
   addCourseContent,
   deleteCourseContent,
+  instructorGetStudentProfile,
 } from "@/lib/api"
 import { useAuth } from "@/lib/auth-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -27,6 +28,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface ContentItem {
   content_id: number
@@ -50,6 +58,16 @@ interface StudentEnrollment {
   student_email?: string | null
 }
 
+interface StudentProfile {
+  student_id: number
+  email_id: string | null
+  age: number
+  skill_level: string
+  category: string
+  country: string
+  enrollments: { course_id: number; course_name: string | null; evaluation_score: number | null }[]
+}
+
 function youtubeEmbedUrl(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
   return match ? `https://www.youtube.com/embed/${match[1]}` : null
@@ -57,12 +75,12 @@ function youtubeEmbedUrl(url: string): string | null {
 
 function typeIcon(type: string) {
   switch (type) {
-    case "video": return "��"
-    case "pdf": return "📄"
-    case "article": return "📰"
-    case "link": return "🔗"
-    case "quiz": return "📝"
-    default: return "📎"
+    case "video": return "[Video]"
+    case "pdf": return "[PDF]"
+    case "article": return "[Article]"
+    case "link": return "[Link]"
+    case "quiz": return "[Quiz]"
+    default: return "[File]"
   }
 }
 
@@ -81,13 +99,15 @@ export default function CoursePage() {
   const [gradeInputs, setGradeInputs] = useState<Record<number, string>>({})
   const [gradingId, setGradingId] = useState<number | null>(null)
 
-  // Video selector — which video to play
   const [activeVideoId, setActiveVideoId] = useState<number | null>(null)
 
-  // Instructor: add content form
   const [newContentType, setNewContentType] = useState("video")
   const [newContentUrl, setNewContentUrl] = useState("")
   const [addingContent, setAddingContent] = useState(false)
+
+  const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(null)
+  const [studentDialogOpen, setStudentDialogOpen] = useState(false)
+  const [studentProfileLoading, setStudentProfileLoading] = useState(false)
 
   useEffect(() => {
     load()
@@ -97,24 +117,20 @@ export default function CoursePage() {
   async function load() {
     setLoading(true)
     try {
-      // Use public courses endpoint — works for all roles
       const courses = await getPublicCourses()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const c = courses.find((x: any) => x.course_id === courseId)
       setCourse(c || null)
 
-      // fetch content for everyone
       try {
         const ct = await getCourseContent(courseId)
         setContents(ct)
-        // Default to first video
         const firstVideo = ct.find((item: ContentItem) => item.type === "video")
         if (firstVideo) setActiveVideoId(firstVideo.content_id)
       } catch {
         setContents([])
       }
 
-      // fetch textbooks (public endpoint, no auth needed)
       try {
         const tb = await getCourseTextbooks(courseId)
         setTextbooks(tb)
@@ -127,7 +143,6 @@ export default function CoursePage() {
         setStudents(s)
       }
 
-      // Check if student is enrolled in this course
       if (user?.role === "student") {
         try {
           const enrollments = await getMyEnrolledCourses()
@@ -197,10 +212,8 @@ export default function CoursePage() {
     try {
       await addCourseContent(courseId, newContentType, newContentUrl.trim())
       setNewContentUrl("")
-      // Refresh content list
       const ct = await getCourseContent(courseId)
       setContents(ct)
-      // If we just added the first video, select it
       if (newContentType === "video" && !activeVideoId) {
         const firstVideo = ct.find((item: ContentItem) => item.type === "video")
         if (firstVideo) setActiveVideoId(firstVideo.content_id)
@@ -227,6 +240,20 @@ export default function CoursePage() {
     }
   }
 
+  async function openStudentProfile(studentId: number) {
+    setStudentProfileLoading(true)
+    setStudentDialogOpen(true)
+    setStudentProfile(null)
+    try {
+      const profile = await instructorGetStudentProfile(studentId)
+      setStudentProfile(profile)
+    } catch {
+      setStudentProfile(null)
+    } finally {
+      setStudentProfileLoading(false)
+    }
+  }
+
   if (!loading && !course) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -249,7 +276,7 @@ export default function CoursePage() {
         <p className="text-destructive">{error}</p>
       ) : (
         <div className="space-y-8">
-          {/* Course info card */}
+
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -270,18 +297,17 @@ export default function CoursePage() {
             </CardHeader>
           </Card>
 
-          {/* ── Textbooks ── */}
+
           {textbooks.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>📚 Textbooks</CardTitle>
+                <CardTitle>Textbooks</CardTitle>
                 <CardDescription>{textbooks.length} textbook{textbooks.length !== 1 ? "s" : ""} linked to this course</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {textbooks.map((tb) => (
                     <div key={tb.textbook_id} className="flex items-start gap-3 rounded-lg border p-4">
-                      <span className="text-2xl">📖</span>
                       <div className="min-w-0 flex-1">
                         <p className="font-medium">{tb.title}</p>
                         <p className="text-xs text-muted-foreground">by {tb.author}</p>
@@ -305,17 +331,17 @@ export default function CoursePage() {
             </Card>
           )}
 
-          {/* ── Video Player with Selector ── */}
+
           {videos.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>🎬 Video Lectures</CardTitle>
+                <CardTitle>Video Lectures</CardTitle>
                 <CardDescription>
                   {videos.length} video{videos.length !== 1 ? "s" : ""} available — select one to watch
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Video selector tabs */}
+
                 <div className="flex flex-wrap gap-2">
                   {videos.map((v, idx) => (
                     <Button
@@ -329,7 +355,7 @@ export default function CoursePage() {
                   ))}
                 </div>
 
-                {/* Active video embed */}
+
                 {activeVideo && (
                   <div className="space-y-2">
                     {activeEmbed ? (
@@ -363,7 +389,7 @@ export default function CoursePage() {
             </Card>
           )}
 
-          {/* ── Other Resources ── */}
+
           {nonVideos.length > 0 && (
             <Card>
               <CardHeader>
@@ -399,7 +425,7 @@ export default function CoursePage() {
                           className="text-destructive hover:text-destructive shrink-0"
                           onClick={() => handleDeleteContent(item.content_id)}
                         >
-                          ✕
+                          
                         </Button>
                       )}
                     </div>
@@ -409,7 +435,7 @@ export default function CoursePage() {
             </Card>
           )}
 
-          {/* ── Instructor: Add Content ── */}
+
           {user?.role === "instructor" && (
             <Card>
               <CardHeader>
@@ -425,10 +451,10 @@ export default function CoursePage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="video">🎬 Video</SelectItem>
-                        <SelectItem value="pdf">📄 PDF</SelectItem>
-                        <SelectItem value="article">📰 Article</SelectItem>
-                        <SelectItem value="link">🔗 Link</SelectItem>
+                        <SelectItem value="video">Video</SelectItem>
+                        <SelectItem value="pdf">PDF</SelectItem>
+                        <SelectItem value="article">Article</SelectItem>
+                        <SelectItem value="link">Link</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -449,7 +475,7 @@ export default function CoursePage() {
             </Card>
           )}
 
-          {/* ── Enrolled Students (instructor only) ── */}
+
           {user?.role === "instructor" && (
             <Card>
               <CardHeader>
@@ -462,14 +488,15 @@ export default function CoursePage() {
                 ) : (
                   <div className="space-y-3">
                     <div className="grid grid-cols-12 gap-2 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      <div className="col-span-5">Student</div>
+                      <div className="col-span-4">Student</div>
                       <div className="col-span-2 text-center">Current Score</div>
-                      <div className="col-span-3 text-center">New Score</div>
-                      <div className="col-span-2 text-center">Action</div>
+                      <div className="col-span-2 text-center">New Score</div>
+                      <div className="col-span-2 text-center">Grade</div>
+                      <div className="col-span-2 text-center">Profile</div>
                     </div>
                     {students.map((s) => (
                       <div key={s.student_id} className="grid grid-cols-12 items-center gap-2 rounded-lg border p-4">
-                        <div className="col-span-5">
+                        <div className="col-span-4">
                           <p className="font-medium">{s.student_email ?? `Student #${s.student_id}`}</p>
                           <p className="text-xs text-muted-foreground">ID: {s.student_id}</p>
                         </div>
@@ -478,7 +505,7 @@ export default function CoursePage() {
                             {s.evaluation_score ?? "N/A"}
                           </Badge>
                         </div>
-                        <div className="col-span-3">
+                        <div className="col-span-2">
                           <Input
                             type="number"
                             min={0}
@@ -498,6 +525,15 @@ export default function CoursePage() {
                             {gradingId === s.student_id ? "Saving…" : "Grade"}
                           </Button>
                         </div>
+                        <div className="col-span-2 text-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openStudentProfile(s.student_id)}
+                          >
+                            View Profile
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -505,6 +541,75 @@ export default function CoursePage() {
               </CardContent>
             </Card>
           )}
+
+
+          <Dialog open={studentDialogOpen} onOpenChange={setStudentDialogOpen}>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              {studentProfileLoading ? (
+                <div className="py-12 text-center text-muted-foreground">Loading student profile…</div>
+              ) : studentProfile ? (
+                <>
+                  <DialogHeader>
+                    <DialogTitle className="text-xl">{studentProfile.email_id ?? `Student #${studentProfile.student_id}`}</DialogTitle>
+                    <DialogDescription>Student Profile</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-6 mt-4">
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="rounded-lg border p-4">
+                        <p className="text-xs font-medium text-muted-foreground uppercase">Age</p>
+                        <p className="text-lg font-semibold">{studentProfile.age}</p>
+                      </div>
+                      <div className="rounded-lg border p-4">
+                        <p className="text-xs font-medium text-muted-foreground uppercase">Country</p>
+                        <p className="text-lg font-semibold">{studentProfile.country}</p>
+                      </div>
+                      <div className="rounded-lg border p-4">
+                        <p className="text-xs font-medium text-muted-foreground uppercase">Skill Level</p>
+                        <Badge variant="secondary" className="text-sm mt-1">{studentProfile.skill_level}</Badge>
+                      </div>
+                      <div className="rounded-lg border p-4">
+                        <p className="text-xs font-medium text-muted-foreground uppercase">Category</p>
+                        <Badge variant="outline" className="text-sm mt-1">{studentProfile.category}</Badge>
+                      </div>
+                    </div>
+
+
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                        Course Enrollments ({studentProfile.enrollments.length})
+                      </h3>
+                      {studentProfile.enrollments.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">Not enrolled in any courses.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {studentProfile.enrollments.map((e) => (
+                            <div key={e.course_id} className="flex items-center justify-between rounded-lg border p-3">
+                              <div>
+                                <p className="font-medium">{e.course_name ?? `Course #${e.course_id}`}</p>
+                                {e.course_id === courseId && (
+                                  <Badge variant="outline" className="text-[10px] mt-1">Current course</Badge>
+                                )}
+                              </div>
+                              <Badge variant={
+                                e.evaluation_score == null ? "secondary"
+                                  : e.evaluation_score >= 40 ? "default"
+                                  : "destructive"
+                              }>
+                                {e.evaluation_score ?? "N/A"}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="py-12 text-center text-muted-foreground">Student not found.</div>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </DashboardShell>

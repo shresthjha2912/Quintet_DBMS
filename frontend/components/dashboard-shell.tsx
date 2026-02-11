@@ -37,7 +37,7 @@ export function DashboardShell({ role, title, children, navItems }: DashboardShe
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top navbar */}
+
       <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
@@ -63,7 +63,7 @@ export function DashboardShell({ role, title, children, navItems }: DashboardShe
         </nav>
       </header>
 
-      {/* Content */}
+
       <main className="mx-auto max-w-7xl px-6 py-8">
         <h1 className="mb-8 font-display text-3xl font-bold text-foreground">{title}</h1>
         {children}

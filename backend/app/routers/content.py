@@ -13,7 +13,6 @@ async def get_course_content(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get all content for a given course."""
     contents = db.query(Content).filter(Content.course_id == course_id).all()
     return [
         {

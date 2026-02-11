@@ -43,18 +43,10 @@ def decode_access_token(token: str) -> dict:
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
-    """Returns the decoded JWT payload: {sub: email_id, role: ..., user_id: ...}"""
     return decode_access_token(token)
 
 
-# ---------- Role-based dependencies ----------
-
 def require_role(*allowed_roles: str):
-    """
-    Dependency factory: only allows users with one of the given roles.
-    Usage:  current_user: dict = Depends(require_role("admin"))
-            current_user: dict = Depends(require_role("student", "admin"))
-    """
     async def role_checker(current_user: dict = Depends(get_current_user)) -> dict:
         if current_user.get("role") not in allowed_roles:
             raise HTTPException(
@@ -65,7 +57,6 @@ def require_role(*allowed_roles: str):
     return role_checker
 
 
-# Convenience shortcuts
 require_student = require_role("student")
 require_instructor = require_role("instructor")
 require_analyst = require_role("analyst")

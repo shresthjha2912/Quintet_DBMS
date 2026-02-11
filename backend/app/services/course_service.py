@@ -7,8 +7,6 @@ from app.schemas.course import CourseCreate
 
 
 def create_course(db: Session, course_data: CourseCreate) -> Course:
-    """Create a new course (called by admin)."""
-    # Verify instructor exists
     instructor = db.query(Instructor).filter(
         Instructor.instructor_id == course_data.instructor_id
     ).first()
@@ -18,7 +16,6 @@ def create_course(db: Session, course_data: CourseCreate) -> Course:
             detail="Instructor not found",
         )
 
-    # Verify university exists
     university = db.query(University).filter(
         University.university_id == course_data.university_id
     ).first()
@@ -42,12 +39,10 @@ def create_course(db: Session, course_data: CourseCreate) -> Course:
 
 
 def get_all_courses(db: Session) -> list[Course]:
-    """Get all courses."""
     return db.query(Course).all()
 
 
 def get_course_by_id(db: Session, course_id: int) -> Course:
-    """Get a single course by ID."""
     course = db.query(Course).filter(Course.course_id == course_id).first()
     if not course:
         raise HTTPException(
@@ -58,12 +53,10 @@ def get_course_by_id(db: Session, course_id: int) -> Course:
 
 
 def get_courses_by_instructor(db: Session, instructor_id: int) -> list[Course]:
-    """Get all courses assigned to a specific instructor."""
     return db.query(Course).filter(Course.instructor_id == instructor_id).all()
 
 
 def delete_course(db: Session, course_id: int) -> None:
-    """Delete a course (called by admin). Also removes related enrollments & content."""
     course = db.query(Course).filter(Course.course_id == course_id).first()
     if not course:
         raise HTTPException(
@@ -71,7 +64,6 @@ def delete_course(db: Session, course_id: int) -> None:
             detail="Course not found",
         )
 
-    # Delete related records first (FK constraints)
     from app.models.enrollment import Enrollment
     from app.models.content import Content
     from app.models.course_topic import CourseTopic
@@ -87,7 +79,6 @@ def delete_course(db: Session, course_id: int) -> None:
 
 
 def assign_instructor(db: Session, course_id: int, instructor_id: int) -> Course:
-    """Assign an instructor to a course (called by admin)."""
     course = db.query(Course).filter(Course.course_id == course_id).first()
     if not course:
         raise HTTPException(
@@ -111,7 +102,6 @@ def assign_instructor(db: Session, course_id: int, instructor_id: int) -> Course
 
 
 def get_course_detail(db: Session, course_id: int) -> dict:
-    """Get detailed course info with instructor name, university name, and enrolled students."""
     course = db.query(Course).filter(Course.course_id == course_id).first()
     if not course:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found")

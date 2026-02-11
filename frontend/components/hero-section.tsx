@@ -33,7 +33,7 @@ function BookIcon({ className }: { className?: string }) {
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden px-6 pb-20 pt-16 md:pb-28 md:pt-24">
-      {/* Background decorative elements */}
+
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-10 top-20 text-primary/[0.06]">
           <DatabaseIcon className="h-40 w-40" />

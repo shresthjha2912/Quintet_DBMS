@@ -186,6 +186,14 @@ export function getEnrollmentsSummary() {
   return apiFetch<Record<string, unknown>[]>("/api/analyst/enrollments/summary");
 }
 
+export function getAnalystCourseDetail(course_id: number) {
+  return apiFetch<Record<string, unknown>>(`/api/analyst/courses/${course_id}`);
+}
+
+export function getAnalystStudentDetail(student_id: number) {
+  return apiFetch<Record<string, unknown>>(`/api/analyst/students/${student_id}`);
+}
+
 // ─── Admin endpoints ───────────────────────────────────
 export function adminGetInstructors() {
   return apiFetch<

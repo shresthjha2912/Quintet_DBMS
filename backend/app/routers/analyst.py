@@ -6,6 +6,8 @@ from app.services.analyst_service import (
     get_general_statistics,
     get_courses_summary,
     get_enrollments_summary,
+    get_course_detail_for_analyst,
+    get_student_detail_for_analyst,
 )
 
 router = APIRouter()
@@ -40,3 +42,23 @@ async def enrollments_summary(
 ):
     """Analyst views enrollment statistics."""
     return get_enrollments_summary(db)
+
+
+@router.get("/courses/{course_id}")
+async def course_detail(
+    course_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_analyst),
+):
+    """Analyst views deep analytics for a single course, including enrolled students."""
+    return get_course_detail_for_analyst(db, course_id)
+
+
+@router.get("/students/{student_id}")
+async def student_detail(
+    student_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_analyst),
+):
+    """Analyst views deep analytics for a single student."""
+    return get_student_detail_for_analyst(db, student_id)
